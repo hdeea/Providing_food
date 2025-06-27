@@ -1,9 +1,11 @@
 
 import React, { useEffect, useRef, useState } from 'react';
+import { scanQrCode } from '@/api/FoodBond/scanQrCode';
 import { Button } from '@/components/ui/button';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { ScanQrCode, Camera, AlertCircle } from 'lucide-react';
-
+import { useToast } from '@/hooks/use-toast';
 interface QRScannerProps {
   onScan: (data: string) => void;
 }

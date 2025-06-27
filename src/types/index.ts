@@ -15,8 +15,6 @@ export interface User {
   token: string;
 }
 
-
-
 export type Restaurant = {
   address: ReactNode;
   restaurantId: number;

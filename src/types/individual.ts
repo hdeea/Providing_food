@@ -13,8 +13,6 @@ export interface DonationIndividualDto {
   id?: number; // للفرونت فقط 
 }
 
-
-
 // Individual donation transaction
 export interface DonationTransaction {
   id: string;

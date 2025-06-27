@@ -25,7 +25,7 @@ type FormData = z.infer<typeof loginSchema>;
 
 const LoginForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth(); // ✅ ما بنحتاج user هون لأننا ناخد من login مباشرة
+  const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -37,42 +37,33 @@ const LoginForm: React.FC = () => {
     },
   });
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      setIsLoading(true);
-      const loggedInUser = await login(data.email, data.password);
+ const onSubmit = async (data: FormData) => {
+  try {
+    setIsLoading(true);
+    const loggedInUser = await login(data.email, data.password);
 
-      if (loggedInUser) {
-        if (loggedInUser.role === "admin") {
-          navigate("/admin");
-          toast({
-            title: "Login successful",
-            description: "Welcome back!",
-          });
-        } else {
-          toast({
-            title: "غير مصرح له بالدخول",
-            description: "هذا الحساب لا يملك صلاحية الدخول.",
-            variant: "destructive",
-          });
-        }
+    if (loggedInUser) {
+      if (loggedInUser.role === "admin") {
+        navigate("/admin"); // لوحة تحكم الجمعية
+      } else if (loggedInUser.role === "restaurant") {
+        navigate("/restaurant"); // لوحة تحكم المطعم
       } else {
         toast({
-          title: "فشل تسجيل الدخول",
-          description: "البريد أو كلمة المرور غير صحيحة أو لا تملك صلاحيات.",
+          title: "غير مصرح له بالدخول",
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } else {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تسجيل الدخول.",
+        title: "فشل تسجيل الدخول",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="w-full max-w-md">
@@ -130,7 +121,6 @@ const LoginForm: React.FC = () => {
           >
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
-
         </form>
       </Form>
     </div>

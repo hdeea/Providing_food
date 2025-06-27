@@ -14,7 +14,7 @@ interface VoucherDetailsProps {
 }
 
 const VoucherDetails: React.FC<VoucherDetailsProps> = ({ voucher, onProcessed, onCancel }) => {
-  const isExpired = new Date(voucher.validUntil) < new Date();
+  const isExpired = new Date(voucher.expiryDate) < new Date();
   const isUsed = voucher.status === 'used';
   const canProcess = !isExpired && !isUsed;
 
@@ -42,7 +42,7 @@ const VoucherDetails: React.FC<VoucherDetailsProps> = ({ voucher, onProcessed, o
           
           <div className="flex items-center gap-2">
             <span className="font-medium">Number of Meals:</span>
-            <Badge variant="outline">{voucher.mealCount} meals</Badge>
+            <Badge variant="outline">{voucher.numberOfMeals} meals</Badge>
           </div>
           
           <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ const VoucherDetails: React.FC<VoucherDetailsProps> = ({ voucher, onProcessed, o
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-red-600" />
             <span className="font-medium">Valid Until:</span>
-            <span>{new Date(voucher.validUntil).toLocaleDateString()}</span>
+            <span>{new Date(voucher.expiryDate).toLocaleDateString()}</span>
           </div>
         </div>
 

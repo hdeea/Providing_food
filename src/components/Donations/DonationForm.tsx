@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DonationRequest } from '../../types';
+import { RestaurantDonation } from '@/types/restaurant';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -22,26 +21,21 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { createRestaurantDonation } from '@/api/donations/createRestaurantDonation';
 
 interface DonationFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (donation: Partial<DonationRequest>) => void;
+  onSave?: (donation: RestaurantDonation) => void;
   restaurantId: string;
 }
 
 const donationSchema = z.object({
-  quantity: z.coerce.number().min(1, 'Quantity must be at least 1'),
-  description: z.string().optional(),
-  pickupDateTime: z.string().min(1, 'Donation date is required'),
-  restaurantName: z.string().min(1, 'Restaurant name is required'),
-  // userType: z.string().min(1, 'User type is required'),
-  category: z.enum(['Dessert', 'EasterFood', 'FastFood'], {
-    required_error: 'Please select a category',
-  }),
+  quantity: z.coerce.number().min(1, 'الكمية مطلوبة ويجب أن تكون رقمًا'),
+  dateDonated: z.string().min(1, 'تاريخ التبرع مطلوب'),
+  restaurantName: z.string().min(1, 'اسم المطعم مطلوب'),
+  deliveryLocation: z.string().min(1, 'موقع التسليم مطلوب'),
 });
 
 type FormData = z.infer<typeof donationSchema>;
@@ -59,43 +53,39 @@ const DonationForm: React.FC<DonationFormProps> = ({
     resolver: zodResolver(donationSchema),
     defaultValues: {
       quantity: 1,
-      description: '',
-      pickupDateTime: new Date().toISOString().slice(0, 16),
+      dateDonated: new Date().toISOString().slice(0, 10),
       restaurantName: '',
-      // userType: '',
-      category: 'FastFood',
+      deliveryLocation: '',
     },
   });
 
   const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+
     try {
-      setIsSubmitting(true);
-      
-      // In a real application, you would send this to an API
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      
-      const donation: Partial<DonationRequest> = {
-        quantity: data.quantity,
-        description: data.description,
-        pickupDateTime: data.pickupDateTime,
-        restaurantId,
-        status: 'pending',
-      };
-      
-      onSave(donation);
-      
-      form.reset();
-      
+  const payload: RestaurantDonation = {
+  quantity: data.quantity,
+  dateDonated: data.dateDonated.slice(0, 10),
+  restaurantName: data.restaurantName.trim(),         // ✂️ قص الفراغات
+  deliveryLocation: data.deliveryLocation.trim(),     // ✂️ كمان هون
+};
+
+console.log("📦 البيانات المرسلة:", payload);
+
+      await createRestaurantDonation(payload);
+
       toast({
-        title: "Donation request submitted",
-        description: "Your donation request has been submitted for approval.",
+        title: "تم إرسال التبرع",
+        description: "شكراً لمساهمتك ❤️",
       });
-      
+
+      form.reset();
+      onSave?.(payload);
       onClose();
     } catch (error) {
       toast({
-        title: "Error",
-        description: "There was an error processing your request.",
+        title: "خطأ",
+        description: "فشل في إرسال التبرع. تحقق من الاتصال أو صحة البيانات.",
         variant: "destructive",
       });
     } finally {
@@ -109,10 +99,10 @@ const DonationForm: React.FC<DonationFormProps> = ({
         <DialogHeader>
           <DialogTitle>طلب تبرع</DialogTitle>
           <DialogDescription>
-            Fill in the details about the food you wish to donate
+            يرجى تعبئة تفاصيل الطعام الذي ترغب بالتبرع به
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -120,32 +110,17 @@ const DonationForm: React.FC<DonationFormProps> = ({
               name="quantity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Quantity</FormLabel>
+                  <FormLabel>الكمية</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Number of meals"
-                      type="number" 
-                      min="1"
+                    <Input
+                      placeholder="عدد الوجبات"
+                      type="number"
+                      min={1}
                       {...field}
                       value={field.value.toString()}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber || 1)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="pickupDateTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Donation Date</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="date"
-                      {...field}
+                      onChange={(e) =>
+                        field.onChange(e.target.valueAsNumber || 1)
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -158,76 +133,49 @@ const DonationForm: React.FC<DonationFormProps> = ({
               name="restaurantName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Restaurant Name</FormLabel>
+                  <FormLabel>اسم المطعم</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter restaurant name" {...field} />
+                    <Input placeholder="أدخل اسم المطعم" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* <FormField
+            <FormField
               control={form.control}
-              name="userType"
+              name="dateDonated"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>User Type</FormLabel>
+                  <FormLabel>تاريخ التبرع</FormLabel>
                   <FormControl>
-                    <Input placeholder="Restaurant" {...field} />
+                    <Input type="date" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
-            /> */}
+            />
 
             <FormField
               control={form.control}
-              name="category"
+              name="deliveryLocation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Dessert">Dessert</SelectItem>
-                      <SelectItem value="EasterFood">Easter Food</SelectItem>
-                      <SelectItem value="FastFood">Fast Food</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormLabel>موقع التسليم</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Describe the food you're donating..."
-                      className="resize-none"
-                      {...field}
-                    />
+                    <Input placeholder="مثلاً: شارع الثورة، دمشق" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             <DialogFooter>
-              <Button variant="outline" type="button" onClick={onClose}>
-                Cancel
+              <Button variant="outline" type="button" onClick={onClose} disabled={isSubmitting}>
+                إلغاء
               </Button>
               <Button type="submit" className="button-blue" disabled={isSubmitting}>
-                {isSubmitting ? "Sending..." : "Send"}
+                {isSubmitting ? "جارٍ الإرسال..." : "إرسال"}
               </Button>
             </DialogFooter>
           </form>

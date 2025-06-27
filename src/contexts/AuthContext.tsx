@@ -32,6 +32,7 @@ const login = async (email: string, password: string): Promise<User | null> => {
     if (!response.ok) return null;
 
     const data = await response.json();
+    console.log("Server response data:", data);
 let role: "admin" | "restaurant" | "individual" = "individual";
 
 if (data.userTypeId === 2) {
@@ -46,7 +47,7 @@ if (data.userTypeId === 2) {
     const mappedUser: User = {
       id: data.userId,
       fullName: data.fullName,
-     role: "admin",
+    role: role, 
       token: data.token,
     };
 

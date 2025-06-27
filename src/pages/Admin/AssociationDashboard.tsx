@@ -11,7 +11,7 @@ import { VoucherIssuance, HelpRequest, DonationIndividualDto } from '../../types
 import { Heart, Ticket, Users, UserPlus } from 'lucide-react';
 import { getIndividualDonations } from '../../api/getDonationIndividuals';
 import { updateDonationStatus } from '../../api/updateDonationStatus';
-
+import { fetchAllFoodVouchers } from '@/api/foodVoucher/getAllVouchers';
 
 const AssociationDashboard: React.FC = () => {
   const [vouchers, setVouchers] = useState<VoucherIssuance[]>([]);
@@ -20,6 +20,18 @@ const AssociationDashboard: React.FC = () => {
   const [donors, setDonors] = useState<DonationIndividualDto[]>([]);
   const { toast } = useToast();
 
+useEffect(() => {
+  const fetchVouchers = async () => {
+    try {
+      const data = await fetchAllFoodVouchers();
+      setVouchers(data);
+    } catch (error) {
+      console.error("فشل في جلب السندات:", error);
+    }
+  };
+
+  fetchVouchers();
+}, []);
 
   useEffect(() => {
     const fetchDonations = async () => {

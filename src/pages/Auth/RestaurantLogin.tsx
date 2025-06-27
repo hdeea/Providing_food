@@ -1,16 +1,25 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function RestaurantLogin() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // مؤقتًا: نحفظ دخول المطعم كتجهيزة للربط لاحقًا
-    localStorage.setItem('restaurantLoggedIn', 'true');
-    navigate('/restaurant/dashboard');
+    const result = await login(email, password);
+    if (result) {
+      navigate('/restaurant/dashboard');
+    } else {
+      setError('فشل تسجيل الدخول، تأكد من البيانات');
+    }
   };
 
   return (
@@ -18,11 +27,24 @@ export default function RestaurantLogin() {
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
         <h2 className="text-2xl font-bold mb-6 text-center">دخول المطاعم</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input type="email" placeholder="البريد الإلكتروني" required />
-          <Input type="password" placeholder="كلمة المرور" required />
+          <Input
+            type="email"
+            placeholder="البريد الإلكتروني"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="كلمة المرور"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
           <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
             تسجيل الدخول
           </Button>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </form>
       </div>
     </div>

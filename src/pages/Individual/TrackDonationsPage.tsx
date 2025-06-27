@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { Search, Heart, User, Mail, Phone, MapPin, Calendar, FileText } from 'lucide-react';
 import {DonationIndividualDto } from '../../types/individual';
+import { getMyDonations } from '@/api/donations/getMyDonation';
 
 const trackSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -30,47 +31,33 @@ const TrackDonationsPage: React.FC = () => {
       email: '',
     },
   });
+const onSubmit = async (data: FormData) => {
+  try {
+    setIsSearching(true);
+    setHasSearched(true);
 
-  const individualDonors: DonationIndividualDto[] = []; // حذف البيانات الوهمية
+    const result = await getMyDonations(data.email);
+    setDonations(result);
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      setIsSearching(true);
-      setHasSearched(true);
-      
-      // محاكاة استعلام API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      // تصفية البيانات بناءً على البريد الإلكتروني
-      const userDonations = individualDonors.filter(
-        donor => donor. userEmail.toLowerCase() === data.email.toLowerCase()
-      );
-      
-      setDonations(userDonations);
-      
-      if (userDonations.length === 0) {
-        toast({
-          title: "No donations found",
-          description: "No donation requests found for this email address.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Donations found",
-          description: `Found ${userDonations.length} donation request(s) for this email.`,
-        });
-      }
-      
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An error occurred while searching. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSearching(false);
-    }
-  };
+    toast({
+      title: result.length === 0 ? "No donations found" : "Donations found",
+      description: result.length === 0 
+        ? "No donation requests found for this email address."
+        : `Found ${result.length} donation request(s).`,
+      variant: result.length === 0 ? "destructive" : "default",
+    });
+
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: "Something went wrong. Please try again.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsSearching(false);
+  }
+};
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {

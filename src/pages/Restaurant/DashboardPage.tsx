@@ -47,10 +47,10 @@ const DashboardPage: React.FC = () => {
 
   const handleVoucherProcessed = () => {
     if (scannedVoucher) {
-      setScannedVoucher({
-        ...scannedVoucher,
-        status: 'used'
-      });
+  setScannedVoucher({
+  ...scannedVoucher,
+  status: 'used'
+} as any); 
     }
   };
 

@@ -35,14 +35,18 @@ const ProtectedRoute = ({
   }
 
   // SECURITY: Block access if no user is logged in
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+if (!user) {
+  const fallbackLogin =
+    allowedRoles.includes("admin") ? "/login" :
+    allowedRoles.includes("restaurant") ? "/restaurant/login" :
+    "/login";
 
-  // SECURITY: Block access if user role is not allowed
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/login" replace />;
-  }
+  return <Navigate to={fallbackLogin} replace />;
+}
+
+if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+  return <Navigate to="/unauthorized" replace />;
+}
 
   return <>{children}</>;
 };
@@ -102,22 +106,15 @@ const App = () => (
             />
             
             {/* Restaurant Routes - PROTECTED */}
-            <Route
-              path="/restaurant"
-              element={
-                <RestaurantRoute>
-                  <DashboardPage />
-                </RestaurantRoute>
-              }
-            />
-            <Route
-              path="/restaurant/dashboard"
-              element={
-                <RestaurantRoute>
-                  <DashboardPage />
-                </RestaurantRoute>
-              }
-            />
+          <Route
+  path="/restaurant/dashboard"
+  element={
+    <RestaurantRoute>
+      <DashboardPage />
+    </RestaurantRoute>
+  }
+/>
+
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
