@@ -16,9 +16,18 @@ import TrackDonationsPage from "./pages/Individual/TrackDonationsPage";
 import HelpRequestPage from "./pages/Individual/HelpRequestPage";
 import TrackRequestPage from "./pages/Individual/TrackRequestPage";
 import { ReactNode } from "react";
-import RestaurantLogin from './pages/Auth/RestaurantLogin';
+import RestaurantLogin from "./pages/Auth/RestaurantLogin";
+import FoodStoreLayout from "./pages/Stores/FoodStoreLayout";
+import StoreLogin from "./pages/Auth/StoreLogin";
+
+import { Register } from "./components/Auth/Register";
+import { Dashboard } from "./components/Stores/Dashboard";
 
 const queryClient = new QueryClient();
+
+const StoreRoute = ({ children }: { children: ReactNode }) => (
+  <ProtectedRoute allowedRoles={["store owner"]}>{children}</ProtectedRoute>
+);
 
 // Protected route component with proper authentication check
 const ProtectedRoute = ({
@@ -31,22 +40,26 @@ const ProtectedRoute = ({
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   // SECURITY: Block access if no user is logged in
-if (!user) {
-  const fallbackLogin =
-    allowedRoles.includes("admin") ? "/login" :
-    allowedRoles.includes("restaurant") ? "/restaurant/login" :
-    "/login";
+  if (!user) {
+    const fallbackLogin = allowedRoles.includes("admin")
+      ? "/login"
+      : allowedRoles.includes("restaurant")
+        ? "/restaurant/login"
+        : "/login";
+    return <Navigate to={fallbackLogin} replace />;
+  }
 
-  return <Navigate to={fallbackLogin} replace />;
-}
-
-if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-  return <Navigate to="/unauthorized" replace />;
-}
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
 
   return <>{children}</>;
 };
@@ -72,13 +85,22 @@ const App = () => (
             <Route path="/restaurant/login" element={<RestaurantLogin />} />
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            
+            <Route path="/register" element={<Register />} />   
             {/* Individual Routes (Public) */}
-            <Route path="/individual/donate" element={<DonorRegistrationPage />} />
-            <Route path="/individual/track-donations" element={<TrackDonationsPage />} />
-            <Route path="/individual/help-request" element={<HelpRequestPage />} />
+            <Route
+              path="/individual/donate"
+              element={<DonorRegistrationPage />}
+            />
+            <Route
+              path="/individual/track-donations"
+              element={<TrackDonationsPage />}
+            />
+            <Route
+              path="/individual/help-request"
+              element={<HelpRequestPage />}
+            />
             <Route path="/individual/track" element={<TrackRequestPage />} />
-            
+
             {/* Admin Routes - PROTECTED */}
             <Route
               path="/admin"
@@ -96,6 +118,8 @@ const App = () => (
                 </AdminRoute>
               }
             />
+          
+<Route path="/store/login" element={<StoreLogin/>} />
             <Route
               path="/admin/beneficiaries"
               element={
@@ -104,18 +128,28 @@ const App = () => (
                 </AdminRoute>
               }
             />
-            
-            {/* Restaurant Routes - PROTECTED */}
-          <Route
+
+        {/* دوري على قسم الـ Restaurant Routes وعدليه ليصير هيك */}
+<Route
   path="/restaurant/dashboard"
   element={
     <RestaurantRoute>
-      <DashboardPage />
+      <FoodStoreLayout />
     </RestaurantRoute>
   }
 />
+ {/* 2. قسم المتاجر الغذائية (الجديد والمستقل) */}
+<Route
+  path="/store/dashboard"
+  element={
+    <StoreRoute>
+      <FoodStoreLayout />
+    </StoreRoute>
+  }
+/>
 
-            
+
+
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>

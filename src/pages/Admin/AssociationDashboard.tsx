@@ -12,6 +12,8 @@ import { Heart, Ticket, Users, UserPlus } from 'lucide-react';
 import { getIndividualDonations } from '../../api/getDonationIndividuals';
 import { updateDonationStatus } from '../../api/updateDonationStatus';
 import { fetchAllFoodVouchers } from '@/api/foodVoucher/getAllVouchers';
+import AdminStoreRequestsTable from "@/pages/Admin/AdminStoreRequestsTable";
+import AdminAllStoreRequestsTable from "./AdminAllStoreRequestsTable";
 
 const AssociationDashboard: React.FC = () => {
   const [vouchers, setVouchers] = useState<VoucherIssuance[]>([]);
@@ -143,7 +145,15 @@ useEffect(() => {
             <TabsTrigger value="donations" className="flex items-center gap-2">
               <Heart className="w-4 h-4" /> طلبــات التبرع 
             </TabsTrigger>
+            <TabsTrigger value="store-requests" className="flex items-center gap-2">
+  🏪 طلبــات المتــاجر
+</TabsTrigger>
+<TabsTrigger value="all-requests" className="flex items-center gap-2">
+  📋 كل الطلبــات
+</TabsTrigger>
+
           </TabsList>
+
 
           <TabsContent value="help-requests">
             <IndividualRequestsTable
@@ -151,6 +161,13 @@ useEffect(() => {
               onStatusChange={handleHelpRequestStatusChange}
             />
           </TabsContent>
+<TabsContent value="store-requests">
+  <AdminStoreRequestsTable />
+</TabsContent>
+
+<TabsContent value="all-requests">
+  <AdminAllStoreRequestsTable />
+</TabsContent>
 
           <TabsContent value="donations">
             <IndividualDonorsTable

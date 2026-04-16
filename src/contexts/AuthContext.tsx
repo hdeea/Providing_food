@@ -14,53 +14,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-useEffect(() => {
-  const storedUser = sessionStorage.getItem("user");
-  if (storedUser) {
-    setUser(JSON.parse(storedUser));
-  }
-  setIsLoading(false);
-}, []);
-const login = async (email: string, password: string): Promise<User | null> => {
-  try {
-    const response = await fetch("/api/User/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setIsLoading(false);
+  }, []);
 
-    if (!response.ok) return null;
+  const login = async (email: string, password: string): Promise<User | null> => {
+    try {
+      const response = await fetch("/api/User/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.json();
-    console.log("Server response data:", data);
-let role: "admin" | "restaurant" | "individual" = "individual";
+      if (!response.ok) return null;
 
-if (data.userTypeId === 2) {
-  role = "admin";
-} else if (data.userTypeId === 3) {
-  role = "restaurant";
-} else {
-  return null; // غير مسموح
-}
+      const data = await response.json();
+      console.log("Server response data:", data);
 
+      let role: "admin" | "restaurant" | "individual" | "store owner" | "donor" | "shelter" = "individual";
 
-    const mappedUser: User = {
-      id: data.userId,
-      fullName: data.fullName,
-    role: role, 
-      token: data.token,
-    };
+      if (data.userTypeId === 1) {
+        role = "restaurant";
+      } 
+      else if (data.userTypeId === 2) {
+        role = "admin";
+      } 
+      else if (data.userTypeId === 3) {
+        role = "donor";
+      } 
+      else if (data.userTypeId === 4) {
+        role = "shelter";
+      } 
+      else if (data.userTypeId === 5) {
+        role = "store owner";
+      } 
+      else if (data.userTypeId === 6) {
+        return null; // Beneficiary غير مسموح
+      }
 
-    setUser(mappedUser);
-    sessionStorage.setItem("user", JSON.stringify(mappedUser));
-    sessionStorage.setItem("justLoggedIn", "true");
+      const mappedUser: User = {
+        id: data.userId,
+        fullName: data.fullName,
+        role: role,
+        token: data.token,
+      };
 
-    return mappedUser;
-  } catch {
-    return null;
-  }
-};
+      setUser(mappedUser);
+      sessionStorage.setItem("user", JSON.stringify(mappedUser));
+      sessionStorage.setItem("justLoggedIn", "true");
 
+      return mappedUser;
+    } catch {
+      return null;
+    }
+  };
 
   const logout = () => {
     setUser(null);

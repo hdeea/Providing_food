@@ -7,6 +7,7 @@ export const registerUser = async (user: CreateAccount) => {
     email: user.email,
     password: user.password,
     phoneNumber: user.phoneNumber,
+    role: user.role,
   };
 
   try {

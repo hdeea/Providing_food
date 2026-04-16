@@ -121,6 +121,16 @@ const LoginForm: React.FC = () => {
           >
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
+          <p className="text-center text-sm mt-4">
+  ليس لديك حساب؟
+  <span
+    className="text-green-600 cursor-pointer ml-1"
+    onClick={() => navigate("/register")}
+  >
+    إنشاء حساب
+  </span>
+</p>
+
         </form>
       </Form>
     </div>

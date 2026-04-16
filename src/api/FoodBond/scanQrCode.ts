@@ -1,7 +1,9 @@
 export const scanQrCode = async (qrCode: string) => {
   const response = await fetch("/api/FoodBond/scan", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ qrCode }),
   });
 

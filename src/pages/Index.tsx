@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Users, Utensils, Gift, UserPlus, HandHeart } from "lucide-react";
+import { Heart, Users, Utensils, Gift, UserPlus, HandHeart,Store } from "lucide-react";
 import { Link } from "react-router-dom";
 
 
@@ -78,7 +78,19 @@ const Index = () => {
               </Link>
             </CardContent>
           </Card>
-
+{/* المتاجر الغذائية - القسم الجديد المستقل */}
+          <Card className="text-center hover:shadow-lg transition-shadow border-t-4 border-t-blue-500">
+            <CardHeader>
+              <Store className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+              <CardTitle>المتاجر الغذائية</CardTitle>
+              <CardDescription>تبرع المتاجر والسلال الغذائية</CardDescription>
+            </CardHeader>
+            <CardContent>
+           <Link to="/store/login"> {/* غيرناها من dashboard لـ login */}
+  <Button className="w-full bg-blue-500 hover:bg-blue-600">دخول المتاجر</Button>
+</Link>
+            </CardContent>
+          </Card>
           {/* Restaurants */}
           <Card className="text-center hover:shadow-lg transition-shadow">
             <CardHeader>

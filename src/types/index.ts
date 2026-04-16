@@ -6,14 +6,17 @@ export interface CreateAccount {
   email: string;
   password: string;
   phoneNumber: string;
+  role: string; // "Store Owner", "Restaurant Owner", "Beneficiary", etc.
 }
 
 export interface User {
+  [x: string]: string | number | boolean;
   id: number;
   fullName: string;
-  role: "admin" | "restaurant" | "individual";
+  role: "admin" | "restaurant" | "individual" | "store owner" | "donor" | "shelter";
   token: string;
 }
+
 
 export type Restaurant = {
   address: ReactNode;
@@ -65,4 +68,17 @@ export interface FoodVoucher {
   qrCode: string;
   validUntil: string;
   createdAt: string;
+}
+
+export interface StoreRequests {
+  requestId: number;
+  storeUserId: number;
+  storeName: string;
+  storeLocation: string;
+  phoneNumber: string;
+  basketCount: number;
+  basketContents: string;
+  status: string;
+  createdAt: string;
+  approvedAt: string | null;
 }

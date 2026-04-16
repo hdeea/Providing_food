@@ -11,16 +11,28 @@ export default function RestaurantLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = await login(email, password);
-    if (result) {
-      navigate('/restaurant/dashboard');
-    } else {
-      setError('فشل تسجيل الدخول، تأكد من البيانات');
-    }
-  };
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
+
+  const result = await login(email, password);
+
+  if (!result) {
+    setError("فشل تسجيل الدخول، تأكد من البيانات");
+    return;
+  }
+
+  // ⭐ التحقق من الدور
+if (result.role?.toLowerCase() !== "restaurant") {
+    setError("هذا البريد غير مخصص لحساب مطعم");
+    return;
+  }
+
+  // ⭐ إذا الدور صحيح → دخليه
+  navigate("/restaurant/dashboard");
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

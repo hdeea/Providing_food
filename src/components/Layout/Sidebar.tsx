@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { User, Utensils, LayoutDashboard } from 'lucide-react';
+import { User, Utensils, LayoutDashboard, Ticket } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -28,6 +28,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       path: '/admin/beneficiaries',
       icon: <User size={20} />,
     },
+    {
+      name: 'Vouchers',
+      path: '/admin/vouchers',
+      icon: <Ticket size={20} />,
+    }
   ];
 
   const restaurantLinks = [
