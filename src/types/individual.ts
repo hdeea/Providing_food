@@ -35,18 +35,18 @@ export interface VoucherRequest {
 
 // Help request from needy individuals (renamed for clarity)
 export interface HelpRequest {
-  id: string;
+  id: number;
+  userId: number;
   name: string;
-  email: string;
   phone: string;
-  reason: string;
   numberOfPeople: number;
-  urgencyLevel: 'low' | 'medium' | 'high';
-  status: 'pending' | 'approved' | 'rejected' | 'fulfilled';
+  maritalStatus: string;
+  maritalStatusImage: string;
+  familySizeImage: string;
+  status: string;
   createdAt: string;
-  reviewedAt?: string;
-  notes?: string;
 }
+
 
 // Food voucher issuance type
 export interface VoucherIssuance {

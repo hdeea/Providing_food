@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await response.json();
       console.log("Server response data:", data);
 
-      let role: "admin" | "restaurant" | "individual" | "store owner" | "donor" | "shelter" = "individual";
+      let role: "admin" | "restaurant" | "individual" | "store owner" | "donor" | "shelter" | "beneficiary" = "individual";
 
       if (data.userTypeId === 1) {
         role = "restaurant";
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role = "store owner";
       } 
       else if (data.userTypeId === 6) {
-        return null; // Beneficiary غير مسموح
+        role = "beneficiary"; // Beneficiary غير مسموح
       }
 
       const mappedUser: User = {

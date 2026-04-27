@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import { StoreRequests } from "@/types";
 import { getAllStoreRequests } from "@/api/Admin/getAllStoreRequests";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { CheckCircle, XCircle, Clock, Store, MapPin, Phone, Package, Calendar } from "lucide-react";
 
 export default function AdminAllStoreRequestsTable() {
   const [requests, setRequests] = useState<StoreRequests[]>([]);
@@ -22,42 +25,135 @@ export default function AdminAllStoreRequestsTable() {
     fetchData();
   }, []);
 
-  if (loading) return <p className="p-4">جاري تحميل الطلبات...</p>;
-  if (requests.length === 0) return <p className="p-4">لا توجد طلبات</p>;
+  const getStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return (
+          <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 font-semibold">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Approved
+          </Badge>
+        );
+      case 'rejected':
+        return (
+          <Badge className="bg-rose-100 text-rose-700 hover:bg-rose-100 font-semibold">
+            <XCircle className="w-3 h-3 mr-1" />
+            Rejected
+          </Badge>
+        );
+      case 'pending':
+        return (
+          <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-semibold">
+            <Clock className="w-3 h-3 mr-1" />
+            Pending
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="secondary" className="font-semibold">
+            {status}
+          </Badge>
+        );
+    }
+  };
+
+  const pendingCount = requests.filter(r => r.status.toLowerCase() === 'pending').length;
+  const approvedCount = requests.filter(r => r.status.toLowerCase() === 'approved').length;
+  const rejectedCount = requests.filter(r => r.status.toLowerCase() === 'rejected').length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="flex items-center gap-3">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent"></div>
+          <p className="text-slate-600 font-semibold">Loading store requests...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4" dir="rtl">
-      <h2 className="text-xl font-bold mb-4">كل طلبات المتاجر</h2>
+    <div className="space-y-6">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-4 gap-3">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-xs text-amber-600 font-semibold uppercase">Pending</p>
+          <p className="text-2xl font-black text-amber-700 mt-1">{pendingCount}</p>
+        </div>
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+          <p className="text-xs text-emerald-600 font-semibold uppercase">Approved</p>
+          <p className="text-2xl font-black text-emerald-700 mt-1">{approvedCount}</p>
+        </div>
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+          <p className="text-xs text-rose-600 font-semibold uppercase">Rejected</p>
+          <p className="text-2xl font-black text-rose-700 mt-1">{rejectedCount}</p>
+        </div>
+        <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">
+          <p className="text-xs text-purple-600 font-semibold uppercase">Total</p>
+          <p className="text-2xl font-black text-purple-700 mt-1">{requests.length}</p>
+        </div>
+      </div>
 
-      <table className="w-full border-collapse border border-gray-300 text-right">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="border p-2">ID</th>
-            <th className="border p-2">اسم المتجر</th>
-            <th className="border p-2">الموقع</th>
-            <th className="border p-2">الهاتف</th>
-            <th className="border p-2">عدد السلال</th>
-            <th className="border p-2">محتوى السلة</th>
-            <th className="border p-2">الحالة</th>
-            <th className="border p-2">تاريخ الإنشاء</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {requests.map((req) => (
-            <tr key={req.requestId}>
-              <td className="border p-2">{req.requestId}</td>
-              <td className="border p-2">{req.storeName}</td>
-              <td className="border p-2">{req.storeLocation}</td>
-              <td className="border p-2">{req.phoneNumber}</td>
-              <td className="border p-2">{req.basketCount}</td>
-              <td className="border p-2">{req.basketContents}</td>
-              <td className="border p-2">{req.status}</td>
-              <td className="border p-2">{req.createdAt}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Table */}
+      <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-lg">
+        {requests.length === 0 ? (
+          <div className="text-center py-16">
+            <Store className="w-16 h-16 mx-auto mb-4 opacity-30 text-slate-400" />
+            <p className="text-slate-500 font-semibold">No store requests available</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50 border-b border-slate-200">
+                  <TableHead className="text-slate-600 font-bold text-xs uppercase tracking-wide">ID</TableHead>
+                  <TableHead className="text-slate-600 font-bold text-xs uppercase tracking-wide">Store Name</TableHead>
+                  <TableHead className="text-slate-600 font-bold text-xs uppercase tracking-wide">Location</TableHead>
+                  <TableHead className="text-slate-600 font-bold text-xs uppercase tracking-wide">Phone</TableHead>
+                  <TableHead className="text-slate-600 font-bold text-xs uppercase tracking-wide">Baskets</TableHead>
+                  <TableHead className="text-slate-600 font-bold text-xs uppercase tracking-wide">Contents</TableHead>
+                  <TableHead className="text-slate-600 font-bold text-xs uppercase tracking-wide">Status</TableHead>
+                  <TableHead className="text-slate-600 font-bold text-xs uppercase tracking-wide">Created</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {requests.map((req) => (
+                  <TableRow key={req.requestId} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                    <TableCell className="font-black text-slate-900">#{req.requestId}</TableCell>
+                    <TableCell className="text-slate-700 font-semibold">{req.storeName}</TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center gap-1 text-slate-600">
+                        <MapPin className="w-3 h-3" />
+                        {req.storeLocation}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center gap-1 text-slate-600">
+                        <Phone className="w-3 h-3" />
+                        {req.phoneNumber}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold">
+                        <Package className="w-3 h-3" />
+                        {req.basketCount}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-slate-600 max-w-xs truncate">{req.basketContents}</TableCell>
+                    <TableCell>{getStatusBadge(req.status)}</TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center gap-1 text-slate-500 text-xs">
+                        <Calendar className="w-3 h-3" />
+                        {req.createdAt}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

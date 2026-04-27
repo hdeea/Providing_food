@@ -13,7 +13,8 @@ export interface User {
   [x: string]: string | number | boolean;
   id: number;
   fullName: string;
-  role: "admin" | "restaurant" | "individual" | "store owner" | "donor" | "shelter";
+  role: "admin" | "restaurant" | "individual" | "store owner" | "donor" | "shelter"|
+  "beneficiary";
   token: string;
 }
 
@@ -38,11 +39,12 @@ export type Restaurant = {
 
 
 export interface Beneficiary {
-  beneficiaryId: number;
   fullName: string;
   phoneNumber: string;
   familySize: number;
-  isActive: boolean;
+  maritalStatus: string;
+  maritalStatusProofImage: File | null;
+  familySizeProofImage: File | null;
 }
 
 

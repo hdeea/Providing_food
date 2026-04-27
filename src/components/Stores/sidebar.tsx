@@ -10,8 +10,8 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
     { id: "home", label: "الرئيسية", icon: Home },
     { id: "vouchers", label: "القسائم", icon: Ticket },
     { id: "settings", label: "انشاء طلب ", icon: Settings },
-  {id: "baskets", label: "طلباتي", icon: ShoppingBasket}
-
+    { id: "baskets", label: "طلباتي", icon: ShoppingBasket },
+    { id: "scan", label: "مسح QR", icon: Ticket }
   ];
 
   return (
@@ -24,10 +24,20 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
       <nav className="space-y-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
+
           return (
             <button
               key={item.id}
-              onClick={() => onSectionChange(item.id)}
+              onClick={() => {
+                // زر مسح QR يفتح صفحة مستقلة
+                if (item.id === "scan") {
+                  window.location.href = "/store/scan";
+                  return;
+                }
+
+                // باقي الأزرار تشتغل داخل نفس الصفحة
+                onSectionChange(item.id);
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition-colors ${
                 activeSection === item.id
                   ? "bg-green-600 text-white"

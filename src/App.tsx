@@ -4,32 +4,55 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ReactNode } from "react";
+
+// Main Pages
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+
+// Admin Pages
 import RestaurantsPage from "./pages/Admin/RestaurantsPage";
 import BeneficiariesPage from "./pages/Admin/BeneficiariesPage";
 import AssociationDashboard from "./pages/Admin/AssociationDashboard";
+import { VouchersAdmin } from "./pages/Admin/VouchersAdmin";
+import GiftDonationsPage from "./pages/Admin/GiftDonationsPage";
+import StoresPage from "./pages/Admin/StoresPage";
+import { getAllBeneficiaryRequests } from "@/api/Admin/Beneficiary/getAllBeneficiaryRequests";
+import { approveBeneficiaryRequest } from "@/api/Admin/Beneficiary/approveBeneficiaryRequest";
+import { rejectBeneficiaryRequest } from "@/api/Admin/Beneficiary/rejectBeneficiaryRequest";
+import AdminPendingRequestsPage from "@/pages/Admin/AdminPendingRequestsPage";
+// Restaurant Pages
 import DashboardPage from "./pages/Restaurant/DashboardPage";
-import DonorRegistrationPage from "./pages/Individual/DonorRegistrationPage";
-import TrackDonationsPage from "./pages/Individual/TrackDonationsPage";
-import HelpRequestPage from "./pages/Individual/HelpRequestPage";
-import TrackRequestPage from "./pages/Individual/TrackRequestPage";
-import { ReactNode } from "react";
 import RestaurantLogin from "./pages/Auth/RestaurantLogin";
+
+// Store Pages
 import FoodStoreLayout from "./pages/Stores/FoodStoreLayout";
 import StoreLogin from "./pages/Auth/StoreLogin";
+import StoreDashboard from "./pages/Stores/StoreDashboard";
+import ScanVoucher from "./pages/Stores/ScanVoucher";
 
+// Individual (Donors)
+import DonorRegistrationPage from "./pages/Individual/DonorRegistrationPage";
+import TrackDonationsPage from "./pages/Individual/TrackDonationsPage";
+
+// Beneficiary Pages (NEW)
+import BeneficiaryRegisterPage from "./pages/Beneficiary/BeneficiaryRegisterPage";
+import BeneficiaryLoginPage from "./pages/Beneficiary/BeneficiaryLoginPage";
+import BeneficiaryDashboard from "./pages/Beneficiary/BeneficiaryDashboard";
+import BeneficiarySubmitPage from "./pages/Beneficiary/BeneficiarySubmitPage";
+import TrackRequestPage from "./pages/Beneficiary/TrackRequestPage";
+
+// Layouts
+import DashboardLayout from "./components/Layout/DashboardLayout";
+
+// Auth Components
 import { Register } from "./components/Auth/Register";
-import { Dashboard } from "./components/Stores/Dashboard";
 
+//Gift Bond
 const queryClient = new QueryClient();
 
-const StoreRoute = ({ children }: { children: ReactNode }) => (
-  <ProtectedRoute allowedRoles={["store owner"]}>{children}</ProtectedRoute>
-);
-
-// Protected route component with proper authentication check
+// Protected Route
 const ProtectedRoute = ({
   children,
   allowedRoles = [],
@@ -47,13 +70,13 @@ const ProtectedRoute = ({
     );
   }
 
-  // SECURITY: Block access if no user is logged in
   if (!user) {
     const fallbackLogin = allowedRoles.includes("admin")
       ? "/login"
       : allowedRoles.includes("restaurant")
-        ? "/restaurant/login"
-        : "/login";
+      ? "/restaurant/login"
+      : "/login";
+
     return <Navigate to={fallbackLogin} replace />;
   }
 
@@ -64,14 +87,17 @@ const ProtectedRoute = ({
   return <>{children}</>;
 };
 
-// Admin route component with strict role checking
+// Role Wrappers
 const AdminRoute = ({ children }: { children: ReactNode }) => (
   <ProtectedRoute allowedRoles={["admin"]}>{children}</ProtectedRoute>
 );
 
-// Restaurant route component with strict role checking
 const RestaurantRoute = ({ children }: { children: ReactNode }) => (
   <ProtectedRoute allowedRoles={["restaurant"]}>{children}</ProtectedRoute>
+);
+
+const StoreRoute = ({ children }: { children: ReactNode }) => (
+  <ProtectedRoute allowedRoles={["store owner"]}>{children}</ProtectedRoute>
 );
 
 const App = () => (
@@ -82,26 +108,24 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/restaurant/login" element={<RestaurantLogin />} />
+
+            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />   
-            {/* Individual Routes (Public) */}
-            <Route
-              path="/individual/donate"
-              element={<DonorRegistrationPage />}
-            />
-            <Route
-              path="/individual/track-donations"
-              element={<TrackDonationsPage />}
-            />
-            <Route
-              path="/individual/help-request"
-              element={<HelpRequestPage />}
-            />
-            <Route path="/individual/track" element={<TrackRequestPage />} />
+            <Route path="/register" element={<Register />} />
 
-            {/* Admin Routes - PROTECTED */}
+            {/* Donor (Individual) */}
+            <Route path="/individual/donate" element={<DonorRegistrationPage />} />
+            <Route path="/individual/track-donations" element={<TrackDonationsPage />} />
+
+            {/* Beneficiary Routes */}
+    <Route path="/beneficiary/register" element={<BeneficiaryRegisterPage />} />
+<Route path="/beneficiary/login" element={<BeneficiaryLoginPage />} />
+<Route path="/beneficiary/dashboard" element={<BeneficiaryDashboard />} />
+<Route path="/beneficiary/submit" element={<BeneficiarySubmitPage />} />
+<Route path="/beneficiary/track" element={<TrackRequestPage />} />
+
+            {/* Admin Routes */}
             <Route
               path="/admin"
               element={
@@ -118,8 +142,14 @@ const App = () => (
                 </AdminRoute>
               }
             />
-          
-<Route path="/store/login" element={<StoreLogin/>} />
+            <Route
+              path="/admin/stores"
+              element={
+                <AdminRoute>
+                  <StoresPage />
+                </AdminRoute>
+              }
+            />
             <Route
               path="/admin/beneficiaries"
               element={
@@ -128,30 +158,51 @@ const App = () => (
                 </AdminRoute>
               }
             />
+            <Route
+              path="/admin/vouchers"
+              element={
+                <DashboardLayout title="Vouchers">
+                  <VouchersAdmin />
+                </DashboardLayout>
+              }
+            />
+            <Route
+              path="/admin/gift-donations"
+              element={
+                <AdminRoute>
+                  <GiftDonationsPage />
+                </AdminRoute>
+              }
+            />
 
-        {/* دوري على قسم الـ Restaurant Routes وعدليه ليصير هيك */}
-<Route
-  path="/restaurant/dashboard"
-  element={
-    <RestaurantRoute>
-      <FoodStoreLayout />
-    </RestaurantRoute>
-  }
-/>
- {/* 2. قسم المتاجر الغذائية (الجديد والمستقل) */}
-<Route
-  path="/store/dashboard"
-  element={
-    <StoreRoute>
-      <FoodStoreLayout />
-    </StoreRoute>
-  }
-/>
+            {/* Restaurant Routes */}
+            <Route path="/restaurant/login" element={<RestaurantLogin />} />
+            <Route
+              path="/restaurant/dashboard"
+              element={
+                <RestaurantRoute>
+                  <FoodStoreLayout />
+                </RestaurantRoute>
+              }
+            />
+<Route path="/admin/pending" element={<AdminPendingRequestsPage />} />
 
+            {/* Store Routes */}
+            <Route path="/store/login" element={<StoreLogin />} />
+            <Route path="/store/scan" element={<ScanVoucher />} />
+            <Route path="/store" element={<StoreDashboard />} />
+            <Route
+              path="/store/dashboard"
+              element={
+                <StoreRoute>
+                  <FoodStoreLayout />
+                </StoreRoute>
+              }
+            />
 
-
-            {/* Catch-all route */}
+            {/* Not Found */}
             <Route path="*" element={<NotFound />} />
+
           </Routes>
         </BrowserRouter>
       </AuthProvider>

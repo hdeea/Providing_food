@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { Heart, LogIn } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email format'),
@@ -44,18 +45,20 @@ const LoginForm: React.FC = () => {
 
     if (loggedInUser) {
       if (loggedInUser.role === "admin") {
-        navigate("/admin"); // لوحة تحكم الجمعية
+        navigate("/admin");
       } else if (loggedInUser.role === "restaurant") {
-        navigate("/restaurant"); // لوحة تحكم المطعم
+        navigate("/restaurant");
       } else {
         toast({
-          title: "غير مصرح له بالدخول",
+          title: "Unauthorized Access",
+          description: "Your account doesn't have admin privileges",
           variant: "destructive",
         });
       }
     } else {
       toast({
-        title: "فشل تسجيل الدخول",
+        title: "Login Failed",
+        description: "Please check your credentials and try again",
         variant: "destructive",
       });
     }
@@ -67,72 +70,92 @@ const LoginForm: React.FC = () => {
 
   return (
     <div className="w-full max-w-md">
-      <div className="text-center mb-8">
-        <div className="inline-block p-2 bg-brand-blue rounded-lg mb-4">
-          <div className="text-white font-bold text-2xl">PF</div>
+      <div className="rounded-[2rem] border border-white/20 bg-white/10 p-10 shadow-2xl shadow-black/20 backdrop-blur-xl">
+        <div className="text-center mb-8">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-white/20 mb-4 border border-white/30">
+            <Heart className="h-8 w-8 text-white fill-white" />
+          </div>
+          <h1 className="text-3xl font-black text-white">Providing Food</h1>
+          <p className="text-white/90 mt-2">Admin Portal</p>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Providing Food</h1>
-        <p className="text-gray-500 mt-2">سجّل دخول للاستمرار</p>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white/90 font-semibold">Email Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="admin@example.com"
+                      {...field}
+                      autoComplete="email"
+                      className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50 focus:border-white/40 focus:bg-white/15"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-rose-300" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white/90 font-semibold">Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      {...field}
+                      autoComplete="current-password"
+                      className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50 focus:border-white/40 focus:bg-white/15"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-rose-300" />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              className="w-full rounded-full bg-white text-emerald-900 hover:bg-slate-100 py-3 text-base font-black shadow-xl shadow-black/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-900 border-t-transparent"></span>
+                  Signing in...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2 justify-center">
+                  <LogIn className="h-5 w-5" />
+                  Sign In
+                </span>
+              )}
+            </Button>
+
+            <p className="text-center text-sm text-white/70 mt-6">
+              Don't have an account?{' '}
+              <span
+                className="text-emerald-300 cursor-pointer font-semibold hover:text-emerald-200 transition"
+                onClick={() => navigate("/register")}
+              >
+                Create one
+              </span>
+            </p>
+          </form>
+        </Form>
       </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="you@example.com"
-                    {...field}
-                    autoComplete="email"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    {...field}
-                    autoComplete="current-password"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button
-            type="submit"
-            className="w-full button-blue"
-            disabled={isLoading}
-          >
-            {isLoading ? "Signing in..." : "Sign in"}
-          </Button>
-          <p className="text-center text-sm mt-4">
-  ليس لديك حساب؟
-  <span
-    className="text-green-600 cursor-pointer ml-1"
-    onClick={() => navigate("/register")}
-  >
-    إنشاء حساب
-  </span>
-</p>
-
-        </form>
-      </Form>
+      <div className="mt-8 text-center">
+        <p className="text-white/60 text-sm">
+          For security purposes, only authorized administrators can access this portal
+        </p>
+      </div>
     </div>
   );
 };
