@@ -72,11 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: role,
         token: data.token,
         userTypeId: data.userTypeId,
-        shelterId: data.shelterId,
-        shelterName: data.shelterName || data.fullName,
-        status: data.status,
-        isVerified: data.isVerified,
-        profileImageUrl: data.profileImageUrl,
+       
       };
 
       setUser(mappedUser);
@@ -144,11 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: role,
         token: user.token,
         userTypeId: data.userTypeId,
-        shelterId: data.shelterId,
-        shelterName: data.shelterName || data.fullName,
-        status: data.status,
-        isVerified: data.isVerified,
-        profileImageUrl: data.profileImageUrl,
+  
       };
 
       setUser(mappedUser);
