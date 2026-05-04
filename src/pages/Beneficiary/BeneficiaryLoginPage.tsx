@@ -1,39 +1,32 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function BeneficiaryLoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 const handleLogin = async () => {
   try {
-    const response = await fetch("/api/User/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    setError("");
+    const result = await login(email, password);
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      alert(data.message || "فشل تسجيل الدخول");
+    if (!result) {
+      setError("فشل تسجيل الدخول، تأكد من البيانات");
       return;
     }
 
-    localStorage.setItem("token", data.token);
+    if (result.role?.toLowerCase() !== "beneficiary") {
+      setError("هذا الحساب ليس حساب مستفيد");
+      return;
+    }
 
-    // ⭐ التحقق من الدور
-  if (data.userTypeId !== 6) {
-  alert("هذا الحساب ليس حساب مستفيد");
-  return;
-}
-
-
-    navigate("/beneficiary/dashboard");
-
-  } catch (err) {
-    alert("حدث خطأ أثناء تسجيل الدخول");
+    setTimeout(() => navigate("/beneficiary/dashboard"), 100);
+  } catch (err: any) {
+    setError(err.message || "حدث خطأ أثناء تسجيل الدخول");
   }
 };
 
@@ -73,6 +66,8 @@ const handleLogin = async () => {
           >
             تسجيل الدخول
           </button>
+
+          {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
           <p className="text-center text-sm text-gray-600">
             ليس لديك حساب؟

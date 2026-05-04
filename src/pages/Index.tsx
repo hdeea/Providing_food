@@ -184,7 +184,14 @@ export default function Index() {
                 title: "Partner Restaurants",
                 desc: "Join as a restaurant partner to serve beneficiaries.",
                 action: "/restaurant/login"
-              }
+              },
+              {
+  icon: Shield,
+  title: "Shelter Posts",
+  desc: "Create posts to request meals from restaurants and donors.",
+  action: "/shelter/login"
+}
+
             ].map((item, index) => (
               <Card key={index} className="overflow-hidden rounded-[2rem] border border-slate-200 shadow-lg transition hover:-translate-y-1 hover:shadow-2xl">
                 <CardHeader className="space-y-6 p-8 text-center">
@@ -369,7 +376,7 @@ export default function Index() {
           </div>
 
           <div className="mt-16 border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
-            © 2026 Providing Food — Built with passion for community
+            ï¿½ 2026 Providing Food ï¿½ Built with passion for community
           </div>
         </div>
       </footer>

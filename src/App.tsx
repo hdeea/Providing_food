@@ -18,6 +18,8 @@ import AssociationDashboard from "./pages/Admin/AssociationDashboard";
 import { VouchersAdmin } from "./pages/Admin/VouchersAdmin";
 import GiftDonationsPage from "./pages/Admin/GiftDonationsPage";
 import StoresPage from "./pages/Admin/StoresPage";
+import SheltersPage from "./pages/Admin/SheltersPage";
+import ShelterLogin from "./pages/Auth/ShelterLogin";
 import { getAllBeneficiaryRequests } from "@/api/Admin/Beneficiary/getAllBeneficiaryRequests";
 import { approveBeneficiaryRequest } from "@/api/Admin/Beneficiary/approveBeneficiaryRequest";
 import { rejectBeneficiaryRequest } from "@/api/Admin/Beneficiary/rejectBeneficiaryRequest";
@@ -51,6 +53,8 @@ import { Register } from "./components/Auth/Register";
 
 //Gift Bond
 const queryClient = new QueryClient();
+import ShelterIndex from "./pages/Shelter/Index";
+import ShelterDashboard from "./components/Shelters/ShelterDashboard";
 
 // Protected Route
 const ProtectedRoute = ({
@@ -75,6 +79,12 @@ const ProtectedRoute = ({
       ? "/login"
       : allowedRoles.includes("restaurant")
       ? "/restaurant/login"
+      : allowedRoles.includes("beneficiary")
+      ? "/beneficiary/login"
+      : allowedRoles.some((role) => role.includes("shelter"))
+      ? "/shelter/login"
+      : allowedRoles.some((role) => role.includes("store"))
+      ? "/store/login"
       : "/login";
 
     return <Navigate to={fallbackLogin} replace />;
@@ -100,6 +110,14 @@ const StoreRoute = ({ children }: { children: ReactNode }) => (
   <ProtectedRoute allowedRoles={["store owner"]}>{children}</ProtectedRoute>
 );
 
+const ShelterRoute = ({ children }: { children: ReactNode }) => (
+  <ProtectedRoute allowedRoles={["shelter owner"]}>{children}</ProtectedRoute>
+);
+
+const BeneficiaryRoute = ({ children }: { children: ReactNode }) => (
+  <ProtectedRoute allowedRoles={["beneficiary"]}>{children}</ProtectedRoute>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -121,9 +139,9 @@ const App = () => (
             {/* Beneficiary Routes */}
     <Route path="/beneficiary/register" element={<BeneficiaryRegisterPage />} />
 <Route path="/beneficiary/login" element={<BeneficiaryLoginPage />} />
-<Route path="/beneficiary/dashboard" element={<BeneficiaryDashboard />} />
-<Route path="/beneficiary/submit" element={<BeneficiarySubmitPage />} />
-<Route path="/beneficiary/track" element={<TrackRequestPage />} />
+<Route path="/beneficiary/dashboard" element={<BeneficiaryRoute><BeneficiaryDashboard /></BeneficiaryRoute>} />
+<Route path="/beneficiary/submit" element={<BeneficiaryRoute><BeneficiarySubmitPage /></BeneficiaryRoute>} />
+<Route path="/beneficiary/track" element={<BeneficiaryRoute><TrackRequestPage /></BeneficiaryRoute>} />
 
             {/* Admin Routes */}
             <Route
@@ -174,6 +192,14 @@ const App = () => (
                 </AdminRoute>
               }
             />
+            <Route
+              path="/admin/shelters"
+              element={
+                <AdminRoute>
+                  <SheltersPage />
+                </AdminRoute>
+              }
+            />
 
             {/* Restaurant Routes */}
             <Route path="/restaurant/login" element={<RestaurantLogin />} />
@@ -186,6 +212,23 @@ const App = () => (
               }
             />
 <Route path="/admin/pending" element={<AdminPendingRequestsPage />} />
+
+            {/* Shelter Routes */}
+            <Route path="/shelter/login" element={<ShelterLogin />} />
+    
+{/* Shelter Routes */}
+<Route path="/shelter/login" element={<ShelterLogin />} />
+
+<Route
+  path="/shelter/dashboard/*"
+  element={
+    <ShelterRoute>
+      <ShelterDashboard />
+    </ShelterRoute>
+  }
+/>
+
+
 
             {/* Store Routes */}
             <Route path="/store/login" element={<StoreLogin />} />

@@ -31,7 +31,7 @@ if (result.role?.toLowerCase() !== "restaurant") {
   }
 
   // ⭐ إذا الدور صحيح → دخليه
-  navigate("/restaurant/dashboard");
+  setTimeout(() => navigate("/restaurant/dashboard"), 100);
 };
 
   return (

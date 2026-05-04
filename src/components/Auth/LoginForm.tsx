@@ -62,6 +62,13 @@ const LoginForm: React.FC = () => {
         variant: "destructive",
       });
     }
+  } catch (error: any) {
+    toast({
+      title: "Login Failed",
+      description: error?.message || "Server is unavailable. Please try again later.",
+      variant: "destructive",
+    });
+    console.error("Login form error:", error);
   } finally {
     setIsLoading(false);
   }

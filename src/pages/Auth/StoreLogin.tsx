@@ -29,7 +29,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     return;
   }
 
-  navigate("/store/dashboard");
+  setTimeout(() => navigate("/store/dashboard"), 100);
 };
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-50">

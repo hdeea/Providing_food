@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HelpRequest } from "@/types/individual";
-import { CheckCircle, XCircle, Phone, Users, Calendar, User, FileImage, Eye } from "lucide-react";
+import { CheckCircle, XCircle, Phone, Users, Calendar, User, Eye } from "lucide-react";
 
 interface Props {
   requests: HelpRequest[];
@@ -38,6 +38,29 @@ const RequestsCards: React.FC<Props> = ({ requests, onStatusChange }) => {
   const approvedCount = requests.filter(r => r.status === "approved").length;
   const rejectedCount = requests.filter(r => r.status === "rejected").length;
 
+  // 🔥 دالة ذكية لمعالجة كل أنواع الصور
+  const safeImage = (img?: string | null) => {
+  if (!img) return "https://placehold.co/150x150?text=No+Image";
+
+  // إذا كانت Base64 (تتكون فقط من A-Z a-z 0-9 + / =)
+  if (/^[A-Za-z0-9+/=]+$/.test(img)) {
+    return `data:image/jpeg;base64,${img}`;
+  }
+
+  // إذا كانت /uploads
+  if (img.startsWith("/uploads")) {
+    return `https://localhost:7060${img}`;
+  }
+
+  // إذا كانت HTML أو أي شي مو صورة
+  if (img.startsWith("<") || img.includes("html") || img.includes("DOCTYPE")) {
+    return "https://placehold.co/150x150?text=No+Image";
+  }
+
+  return img;
+};
+
+
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
@@ -64,6 +87,7 @@ const RequestsCards: React.FC<Props> = ({ requests, onStatusChange }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {requests.map((req) => (
           <div key={req.id} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg hover:shadow-xl transition">
+            
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-3">
@@ -102,27 +126,33 @@ const RequestsCards: React.FC<Props> = ({ requests, onStatusChange }) => {
 
             {/* Images */}
             <div className="grid grid-cols-2 gap-3 mb-6">
+              
+              {/* Marital Status Image */}
               <div className="relative group">
-                <img
-                  src={req.maritalStatusImage}
-                  alt="Marital Status Proof"
-                  className="w-full h-20 object-cover rounded-lg border border-slate-200"
-                />
+             <img
+  src={safeImage(req.maritalStatusImage)}
+  className="w-full h-20 object-cover rounded-lg border border-slate-200"
+/>
+
+
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center">
                   <Eye className="w-5 h-5 text-white" />
                 </div>
               </div>
 
+              {/* Family Size Image */}
               <div className="relative group">
-                <img
-                  src={req.familySizeImage}
-                  alt="Family Size Proof"
-                  className="w-full h-20 object-cover rounded-lg border border-slate-200"
-                />
+               <img
+  src={safeImage(req.familySizeImage)}
+  className="w-full h-20 object-cover rounded-lg border border-slate-200"
+/>
+
+
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center">
                   <Eye className="w-5 h-5 text-white" />
                 </div>
               </div>
+
             </div>
 
             {/* Actions */}
@@ -145,6 +175,7 @@ const RequestsCards: React.FC<Props> = ({ requests, onStatusChange }) => {
                 </Button>
               </div>
             )}
+
           </div>
         ))}
       </div>

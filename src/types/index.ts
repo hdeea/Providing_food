@@ -10,13 +10,15 @@ export interface CreateAccount {
 }
 
 export interface User {
-  [x: string]: string | number | boolean;
   id: number;
+  userTypeId: number;
   fullName: string;
-  role: "admin" | "restaurant" | "individual" | "store owner" | "donor" | "shelter"|
-  "beneficiary";
+  role: "admin" | "restaurant" | "individual" | "store owner" | "donor" | "shelter owner" | "beneficiary";
   token: string;
+  email?: string;
 }
+
+
 
 
 export type Restaurant = {
@@ -37,6 +39,25 @@ export type Restaurant = {
   isActive?: boolean;
 };
 
+// Shelter types
+export type Shelter = {
+  id: number;
+  shelterId: number;
+  shelterName: string;
+  shelterEmail: string;
+  shelterPhone: string;
+  shelterAddress: string;
+  userId?: number;
+  fullName: string;
+  email: string;
+  password?: string;
+  phoneNumber: string;
+  capacity?: number;
+  description?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'active';
+  createdAt?: string;
+  approvedAt?: string;
+};
 
 export interface Beneficiary {
   fullName: string;

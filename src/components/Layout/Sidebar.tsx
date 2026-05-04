@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { User, Utensils, LayoutDashboard, Ticket, Store, Gift } from 'lucide-react';
+import { User, Utensils, LayoutDashboard, Ticket, Store, Gift, Home } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,35 +14,40 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
 
   const adminLinks = [
     {
-      name: 'Dashboard',
+      name: 'لوحة التحكم',
       path: '/admin',
-      icon: <LayoutDashboard size={20} />,
+      icon: <LayoutDashboard size={20} />, 
     },
     {
-      name: 'Restaurants',
+      name: 'المطاعم',
       path: '/admin/restaurants',
-      icon: <Utensils size={20} />,
+      icon: <Utensils size={20} />, 
     },
     {
-      name: 'Stores',
+      name: 'المتاجر',
       path: '/admin/stores',
-      icon: <Store size={20} />,
+      icon: <Store size={20} />, 
     },
     {
-      name: 'Beneficiaries',
+      name: 'المستفيدون',
       path: '/admin/beneficiaries',
-      icon: <User size={20} />,
+      icon: <User size={20} />, 
     },
     {
-      name: 'Vouchers',
-      path: '/admin/vouchers',
-      icon: <Ticket size={20} />,
+      name: 'الملاجئ',
+      path: '/admin/shelters',
+      icon: <Home size={20} />, 
     },
     {
-      name: 'Gift Donations',
+      name: 'الحسنات',
       path: '/admin/gift-donations',
-      icon: <Gift size={20} />,
-    }
+      icon: <Gift size={20} />, 
+    },
+    {
+      name: 'القسائم',
+      path: '/admin/vouchers',
+      icon: <Ticket size={20} />, 
+    },
   ];
 
   const restaurantLinks = [

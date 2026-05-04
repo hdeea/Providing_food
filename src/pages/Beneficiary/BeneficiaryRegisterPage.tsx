@@ -1,37 +1,30 @@
 import { useState } from "react";
-import { registerUser } from "@/api/User/register";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function BeneficiaryRegisterPage() {
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async () => {
     try {
-      const payload = {
-        fullName,
-        email,
-        phoneNumber,
-        password,
-        role: "Beneficiary", // ⭐ أهم إضافة
-      };
+      setError("");
+      const result = await register(fullName, email, password, phoneNumber, "Beneficiary");
 
-      const data = await registerUser(payload);
-
-      // حفظ التوكن إذا رجع من السيرفر
-      if (data.token) {
-        localStorage.setItem("token", data.token);
+      if (!result) {
+        setError("فشل إنشاء الحساب");
+        return;
       }
 
-      alert("تم إنشاء الحساب بنجاح");
-      navigate("/beneficiary/login");
-
-    } catch (err) {
-      alert("حدث خطأ أثناء إنشاء الحساب");
+      setTimeout(() => navigate("/beneficiary/dashboard"), 100);
+    } catch (err: any) {
+      setError(err.message || "حدث خطأ أثناء إنشاء الحساب");
     }
   };
 
@@ -89,10 +82,12 @@ export default function BeneficiaryRegisterPage() {
           {/* Submit Button */}
           <button
             onClick={handleSubmit}
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl text-lg font-semibold"
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 rounded-xl text-lg font-semibold transition shadow-md"
           >
             إنشاء الحساب
           </button>
+
+          {error && <p className="text-red-600 text-sm text-center mt-2">{error}</p>}
 
           <p className="text-center text-green-700 mt-4">
             لديك حساب؟{" "}
