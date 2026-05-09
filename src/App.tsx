@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ReactNode } from "react";
+import ChallengesPage from "./pages/Chellenge/ChallengesPage";
+import ChallengeDetailsPage from "./pages/Chellenge/ChallengeDetailsPage";
 
 // Main Pages
 import Index from "./pages/Index";
@@ -45,17 +47,30 @@ import BeneficiaryDashboard from "./pages/Beneficiary/BeneficiaryDashboard";
 import BeneficiarySubmitPage from "./pages/Beneficiary/BeneficiarySubmitPage";
 import TrackRequestPage from "./pages/Beneficiary/TrackRequestPage";
 
+// Donor Pages
+import DonorDonateOptions from "./pages/Donor/DonorDashboard";
+import DonateCash from "./pages/Donor/DonateCash";
+import DonateMeals from "./pages/Donor/DonateMeals";
+import DonateGift from "./pages/Donor/DonateGift";
+import DonorPoints from "./pages/Donor/DonorPoints";
+import Winners from "./pages/Donor/Winners";
+
+
 // Layouts
 import DashboardLayout from "./components/Layout/DashboardLayout";
 
 // Auth Components
 import { Register } from "./components/Auth/Register";
+import DonorLogin from "./pages/Auth/DonorLogin";
 
 //Gift Bond
 const queryClient = new QueryClient();
 import ShelterIndex from "./pages/Shelter/Index";
 import ShelterDashboard from "./components/Shelters/ShelterDashboard";
-
+import AdminChallengesPage from "./pages/Admin/Chellenge/AdminChallengePage";
+import ChallengeViewPage from "./pages/Admin/Chellenge/ChallengeViewPage";
+import EditChallengePage from "./pages/Admin/Chellenge/EditChallengePage";
+import CreateChallengePage from "./pages/Admin/Chellenge/CreateChallengePage";
 // Protected Route
 const ProtectedRoute = ({
   children,
@@ -127,6 +142,11 @@ const App = () => (
         <BrowserRouter>
           <Routes>
 
+<Route path="/challenges" element={<ChallengesPage />} />
+<Route path="/challenges/:id" element={<ChallengeDetailsPage />} />
+<Route path="/donor/login" element={<DonorLogin />} />
+
+
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
@@ -135,6 +155,14 @@ const App = () => (
             {/* Donor (Individual) */}
             <Route path="/individual/donate" element={<DonorRegistrationPage />} />
             <Route path="/individual/track-donations" element={<TrackDonationsPage />} />
+
+
+<Route path="/donor/donate" element={<DonorDonateOptions />} />
+<Route path="/donor/donate/cash" element={<DonateCash />} />
+<Route path="/donor/donate/meals" element={<DonateMeals />} />
+<Route path="/donor/donate/gift" element={<DonateGift />} />
+<Route path="/donor/points" element={<DonorPoints />} />
+<Route path="/donor/winners" element={<Winners />} />
 
             {/* Beneficiary Routes */}
     <Route path="/beneficiary/register" element={<BeneficiaryRegisterPage />} />
@@ -200,6 +228,43 @@ const App = () => (
                 </AdminRoute>
               }
             />
+<Route
+  path="/admin/challenges"
+  element={
+    <AdminRoute>
+      <AdminChallengesPage />
+    </AdminRoute>
+  }
+/>
+
+<Route
+  path="/admin/challenges/create"
+  element={
+    <AdminRoute>
+      <CreateChallengePage />
+    </AdminRoute>
+  }
+/>
+
+<Route
+  path="/admin/challenges/edit/:id"
+  element={
+    <AdminRoute>
+      <EditChallengePage />
+    </AdminRoute>
+  }
+/>
+
+<Route
+  path="/admin/challenges/:id"
+  element={
+    <AdminRoute>
+      <ChallengeViewPage />
+    </AdminRoute>
+  }
+/>
+
+
 
             {/* Restaurant Routes */}
             <Route path="/restaurant/login" element={<RestaurantLogin />} />
@@ -216,7 +281,6 @@ const App = () => (
             {/* Shelter Routes */}
             <Route path="/shelter/login" element={<ShelterLogin />} />
     
-{/* Shelter Routes */}
 <Route path="/shelter/login" element={<ShelterLogin />} />
 
 <Route

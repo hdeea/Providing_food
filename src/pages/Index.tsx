@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import {
@@ -24,8 +24,13 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { ChallengesInfoModal, ChallengeDetailsModal } from "../pages/Chellenge/challenges-modals";
 
 export default function Index() {
+
+  const [showChallengesModal, setShowChallengesModal] = useState(false);
+const [showDetailsModal, setShowDetailsModal] = useState(false);
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <motion.header
@@ -66,6 +71,72 @@ export default function Index() {
       </motion.header>
 
       <main>
+        
+{/* 🌙 تحدي 10 أيام رمضان */}
+<section className="max-w-7xl mx-auto px-6 py-16">
+  <div className="rounded-[2rem] bg-gradient-to-br from-emerald-700 to-emerald-900 text-white p-10 shadow-xl">
+    <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+
+      <div>
+        <h2 className="text-4xl font-black mb-4">🌙 تحدي 10 أيام رمضان</h2>
+        <p className="text-lg text-emerald-100 leading-relaxed">
+          شارك في تحدي العشرة أيام من رمضان وساهم في توزيع آلاف الوجبات على المحتاجين.
+          كل يوم يمر، يزداد الأجر وتزداد البركة.
+        </p>
+
+       <div className="mt-8 flex flex-wrap gap-4">
+  <Button
+    className="rounded-full bg-white text-emerald-900 px-8 py-4 font-black shadow-lg hover:bg-slate-100"
+    onClick={() => setShowChallengesModal(true)}
+  >
+    عرض التحديات
+  </Button>
+
+  <Button
+    className="rounded-full border border-white/40 bg-white/10 px-8 py-4 font-black text-white shadow-lg hover:bg-white/20"
+    onClick={() => setShowDetailsModal(true)}
+  >
+    تفاصيل التحدي
+  </Button>
+
+  <Link to="/login">
+    <Button className="rounded-full bg-emerald-900 px-8 py-4 font-black text-white shadow-lg hover:bg-emerald-800">
+      تبرع الآن
+    </Button>
+  </Link>
+</div>
+
+      </div>
+
+      <div className="rounded-3xl bg-white/10 p-8 backdrop-blur-xl shadow-lg">
+        <h3 className="text-2xl font-black mb-4">إحصائيات التحدي</h3>
+
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div className="rounded-2xl bg-white/20 p-5 text-center">
+            <p className="text-3xl font-black">10</p>
+            <p className="text-sm text-emerald-200">عدد الأيام</p>
+          </div>
+
+          <div className="rounded-2xl bg-white/20 p-5 text-center">
+            <p className="text-3xl font-black">+5000</p>
+            <p className="text-sm text-emerald-200">وجبة مستهدفة</p>
+          </div>
+
+          <div className="rounded-2xl bg-white/20 p-5 text-center">
+            <p className="text-3xl font-black">رمضان</p>
+            <p className="text-sm text-emerald-200">الشهر المبارك</p>
+          </div>
+
+          <div className="rounded-2xl bg-white/20 p-5 text-center">
+            <p className="text-3xl font-black">مفتوح</p>
+            <p className="text-sm text-emerald-200">الحالة</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
         <section className="relative overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-600 to-slate-900 px-6 py-20 text-white">
           <div className="pointer-events-none absolute -right-24 top-12 h-80 w-80 rounded-full bg-white/10 blur-3xl"></div>
           <div className="pointer-events-none absolute -left-24 top-40 h-72 w-72 rounded-full bg-emerald-300/10 blur-3xl"></div>
@@ -311,6 +382,16 @@ export default function Index() {
             </div>
           </div>
         </section>
+        <ChallengesInfoModal
+  open={showChallengesModal}
+  onClose={() => setShowChallengesModal(false)}
+/>
+
+<ChallengeDetailsModal
+  open={showDetailsModal}
+  onClose={() => setShowDetailsModal(false)}
+/>
+
       </main>
 
       <footer className="bg-slate-950 text-slate-200">

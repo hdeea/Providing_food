@@ -77,7 +77,7 @@ export default function ShelterDashboard() {
                 }
               />
 
-              <Route path="posts" element={<Posts posts={posts} />} />
+              <Route path="posts" element={<Posts />} />
 
               <Route path="create-post" element={<CreatePost />} />
 

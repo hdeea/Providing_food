@@ -14,20 +14,22 @@ import { updateDonationStatus } from '../../api/updateDonationStatus';
 import { fetchAllFoodVouchers } from '@/api/foodVoucher/getAllVouchers';
 import AdminStoreRequestsTable from "@/pages/Admin/AdminStoreRequestsTable";
 import AdminAllStoreRequestsTable from "./AdminAllStoreRequestsTable";
+import { useNavigate } from "react-router-dom";
 
-// ⭐ استيراد فيتش المستفيدين
+//  استيراد المستفيدين
 import { getAllBeneficiaryRequests } from "@/api/Admin/Beneficiary/getAllBeneficiaryRequests";
 import { approveBeneficiaryRequest } from "@/api/Admin/Beneficiary/approveBeneficiaryRequest";
 import { rejectBeneficiaryRequest } from "@/api/Admin/Beneficiary/rejectBeneficiaryRequest";
 import RequestsCards from "@/components/Requests/RequestsCards";
 
 const AssociationDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [vouchers, setVouchers] = useState<VoucherIssuance[]>([]);
   const [helpRequests, setHelpRequests] = useState<HelpRequest[]>([]);
   const [donors, setDonors] = useState<DonationIndividualDto[]>([]);
   const { toast } = useToast();
 
-  // ⭐ Fetch Food Vouchers
+  //   Vouchers
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
@@ -40,7 +42,7 @@ const AssociationDashboard: React.FC = () => {
     fetchVouchers();
   }, []);
 
-  // ⭐ Fetch Individual Donations
+  //  Individual Donations
   useEffect(() => {
     const fetchDonations = async () => {
       try {
@@ -57,7 +59,7 @@ const AssociationDashboard: React.FC = () => {
     fetchDonations();
   }, []);
 
-  // ⭐ Fetch Beneficiary Help Requests
+  //  Beneficiary Help Requests
 useEffect(() => {
   const fetchHelpRequests = async () => {
     try {
@@ -85,7 +87,7 @@ useEffect(() => {
   fetchHelpRequests();
 }, []);
 
-  // ⭐ Update Donor Status
+  // Update Donor Status
   const handleDonorStatusChange = async (
     requestId: number,
     newStatus: 'Approved' | 'Rejected'
@@ -110,7 +112,7 @@ useEffect(() => {
     }
   };
 
-  // ⭐ Update Help Request Status
+  //  Update Help Request Status
   const handleHelpRequestStatusChange = async (
     requestId: number,
     newStatus: 'approved' | 'rejected'
@@ -139,6 +141,14 @@ useEffect(() => {
   return (
     <DashboardLayout title="Association Control Panel">
       <div className="space-y-6">
+ {/* زر التحديات */}
+  <button
+    onClick={() => navigate("/admin/challenges")}
+    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold shadow-md hover:bg-emerald-700 transition"
+  >
+    <span>🏆</span>
+    <span>Challenges</span>
+  </button>
 
         {/* ⭐ Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -345,5 +355,4 @@ useEffect(() => {
     </DashboardLayout>
   );
 };
-
 export default AssociationDashboard;

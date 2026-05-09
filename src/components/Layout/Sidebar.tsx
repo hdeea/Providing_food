@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       icon: <Home size={20} />, 
     },
     {
-      name: 'الحسنات',
+      name: 'الاهداءات',
       path: '/admin/gift-donations',
       icon: <Gift size={20} />, 
     },
