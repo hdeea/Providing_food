@@ -11,13 +11,11 @@ export default function AdminChallengesPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
-  // رسالة داخل الصفحة
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
 
-  // الـ Modal
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   useEffect(() => {
@@ -160,6 +158,20 @@ export default function AdminChallengesPage() {
                   "
                 >
                   عرض التفاصيل
+                </button>
+
+                {/* ⭐ عرض المتصدرين */}
+                <button
+                  onClick={() => navigate(`/donor/winners/${c.id}`)}
+                  className="
+                    w-full py-2.5 rounded-xl font-semibold
+                    bg-yellow-500 text-white
+                    hover:bg-yellow-600
+                    transition-all duration-200
+                    shadow-sm hover:shadow-md
+                  "
+                >
+                  ⭐ عرض المتصدرين
                 </button>
 
                 {/* تعديل */}

@@ -29,6 +29,7 @@ interface Store {
 const StoresPage: React.FC = () => {
   const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -133,6 +134,10 @@ const StoresPage: React.FC = () => {
   const activeCount = stores.filter(s => (s.status || '').toLowerCase() === 'approved').length;
   const pendingCount = stores.filter(s => (s.status || '').toLowerCase() === 'pending').length;
   const rejectedCount = stores.filter(s => (s.status || '').toLowerCase() === 'rejected').length;
+  const filteredStores =
+    statusFilter === 'all'
+      ? stores
+      : stores.filter((s) => (s.status || '').toLowerCase() === statusFilter);
 
   if (loading) {
     return (
@@ -148,34 +153,71 @@ const StoresPage: React.FC = () => {
   }
 
   return (
+    
     <DashboardLayout title="Stores Management">
+
+        {/* ⭐ Summary Cards */}
+<div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+  <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+    <p className="text-xs text-emerald-600 font-semibold uppercase">Approved</p>
+    <p className="text-3xl font-black text-emerald-700 mt-1">{activeCount}</p>
+  </div>
+
+  <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
+    <p className="text-xs text-amber-600 font-semibold uppercase">Pending</p>
+    <p className="text-3xl font-black text-amber-700 mt-1">{pendingCount}</p>
+  </div>
+
+  <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-center">
+    <p className="text-xs text-red-600 font-semibold uppercase">Rejected</p>
+    <p className="text-3xl font-black text-red-700 mt-1">{rejectedCount}</p>
+  </div>
+
+  <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-center">
+    <p className="text-xs text-blue-600 font-semibold uppercase">Total</p>
+    <p className="text-3xl font-black text-blue-700 mt-1">{stores.length}</p>
+  </div>
+</div>
+
+
       <div className="space-y-6">
-        {/* Summary Cards */}
-        <div className="grid grid-cols-4 gap-3">
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-            <p className="text-xs text-emerald-600 font-semibold uppercase">Approved</p>
-            <p className="text-2xl font-black text-emerald-700 mt-1">{activeCount}</p>
-          </div>
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-            <p className="text-xs text-amber-600 font-semibold uppercase">Pending</p>
-            <p className="text-2xl font-black text-amber-700 mt-1">{pendingCount}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs text-slate-600 font-semibold uppercase">Rejected</p>
-            <p className="text-2xl font-black text-slate-700 mt-1">{rejectedCount}</p>
-          </div>
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-            <p className="text-xs text-blue-600 font-semibold uppercase">Total</p>
-            <p className="text-2xl font-black text-blue-700 mt-1">{stores.length}</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">Stores Management</h1>
+              <p className="text-sm text-slate-500 mt-1">عرض الطلبات حسب الحالة</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Pending', value: 'pending', count: pendingCount },
+                { label: 'Approved', value: 'approved', count: activeCount },
+                { label: 'Rejected', value: 'rejected', count: rejectedCount },
+                { label: 'All', value: 'all', count: stores.length },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setStatusFilter(option.value as any)}
+                  className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                    statusFilter === option.value
+                      ? 'bg-slate-900 text-white shadow-lg'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  {option.label} ({option.count})
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
+  
+
         {/* Table */}
         <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-lg">
-          {stores.length === 0 ? (
+          {filteredStores.length === 0 ? (
             <div className="text-center py-16">
               <Store className="w-16 h-16 mx-auto mb-4 opacity-30 text-slate-400" />
-              <p className="text-slate-500 font-semibold">No stores available</p>
+              <p className="text-slate-500 font-semibold">لا توجد متاجر في هذا العرض</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -192,7 +234,7 @@ const StoresPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {stores.map((store) => (
+                  {filteredStores.map((store) => (
                     <TableRow key={store.storeRequestId || store.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
                       <TableCell className="font-black text-slate-900">#{store.storeRequestId || store.id}</TableCell>
                       <TableCell className="text-slate-700 font-semibold">{store.storeName || store.name}</TableCell>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
+import { getChallengeById } from "@/api/Admin/challenge/getChallengeById";
 
 export default function ChallengeDetailsPage() {
   const { id } = useParams();
@@ -10,9 +11,7 @@ export default function ChallengeDetailsPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`/api/challenge/${id}`);
-        if (!res.ok) throw new Error("Failed to load challenge");
-        const data = await res.json();
+        const data = await getChallengeById(Number(id));
         setChallenge(data);
       } catch {
         setChallenge(null);
@@ -46,6 +45,11 @@ export default function ChallengeDetailsPage() {
           ← رجوع
         </Button>
       </Link>
+<Link to={`/donor/winners/${id}`}>
+        <Button className="bg-emerald-700 text-white hover:bg-emerald-800 rounded-xl px-6 py-2">
+          عرض المتصدرين
+        </Button>
+</Link>
 
       <div className="rounded-3xl bg-white shadow-xl p-10 border border-slate-200">
         <h1 className="text-4xl font-black text-slate-900 mb-4">
@@ -83,15 +87,17 @@ export default function ChallengeDetailsPage() {
         </div>
 
         <div className="mt-10 flex flex-col sm:flex-row gap-4">
-          <Link to="/individual/donate">
+          <Link to={`/donor/winners/${id}`}>
             <Button className="w-full rounded-full bg-emerald-700 text-white px-8 py-4 text-lg font-black hover:bg-emerald-800">
-              تبرع الآن
+              عرض المتصدرين
             </Button>
           </Link>
 
-          <Button className="w-full rounded-full bg-white border border-emerald-700 text-emerald-700 px-8 py-4 text-lg font-black hover:bg-emerald-50">
-            شارك في التحدي
-          </Button>
+          <Link to="/donor/points">
+            <Button className="w-full rounded-full bg-white border border-emerald-700 text-emerald-700 px-8 py-4 text-lg font-black hover:bg-emerald-50">
+              نقاطي
+            </Button>
+          </Link>
         </div>
 
       </div>

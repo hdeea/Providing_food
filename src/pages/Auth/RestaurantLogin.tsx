@@ -3,11 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { UtensilsCrossed, LogIn, UserPlus } from "lucide-react";
 
 export default function RestaurantLogin() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, register } = useAuth();
 
+  const [isRegister, setIsRegister] = useState(false);
+
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,37 +21,71 @@ export default function RestaurantLogin() {
     e.preventDefault();
     setError("");
 
-    const result = await login(email, password);
+    try {
+      let result;
 
-    if (!result) {
-      setError("فشل تسجيل الدخول، تأكد من البيانات");
-      return;
+      if (isRegister) {
+
+        result = await register(fullName, email, password, phoneNumber, "restaurant");
+      } else {
+        result = await login(email, password);
+      }
+
+      if (!result) {
+        setError("❌ فشل العملية، تأكد من بياناتك");
+        return;
+      }
+
+      if (result.role?.toLowerCase() !== "restaurant") {
+        setError("هذا الحساب ليس حساب مطعم، قم بإنشاء حساب جديد أولاً");
+        return;
+      }
+      setTimeout(() => navigate("/restaurant/dashboard"), 100);
+
+    } catch (err: any) {
+      setError(err.message || "حدث خطأ أثناء العملية");
     }
-
-    // التحقق من الدور
-    if (result.role?.toLowerCase() !== "restaurant") {
-      setError("هذا البريد غير مخصص لحساب مطعم");
-      return;
-    }
-
-    // نجاح
-    setTimeout(() => navigate("/restaurant/dashboard"), 100);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-emerald-50">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-96 border border-emerald-200">
-        <h2 className="text-3xl font-bold mb-6 text-center text-emerald-700">
-          دخول المطاعم
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-700 via-emerald-600 to-slate-900">
+      <div className="w-full max-w-md rounded-[2rem] border border-white/20 bg-white/10 p-10 shadow-2xl backdrop-blur-xl">
+
+        <div className="text-center mb-8">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-white/20 mb-4 border border-white/30">
+            <UtensilsCrossed className="h-8 w-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-black text-white">Providing Food</h1>
+          <p className="text-white/90 mt-2">Restaurant Portal</p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {isRegister && (
+            <>
+              <Input
+                placeholder="اسم المطعم"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50"
+                required
+              />
+
+              <Input
+                placeholder="رقم الهاتف"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50"
+              />
+            </>
+          )}
+
           <Input
             type="email"
             placeholder="البريد الإلكتروني"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border-emerald-300 focus:ring-emerald-500"
+            className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50"
             required
           />
 
@@ -55,21 +94,51 @@ export default function RestaurantLogin() {
             placeholder="كلمة المرور"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border-emerald-300 focus:ring-emerald-500"
+            className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50"
             required
           />
 
           <Button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-semibold"
+            className="w-full flex items-center justify-center gap-2 rounded-full bg-white text-emerald-900 hover:bg-slate-100 py-3 text-base font-black shadow-xl shadow-black/20 transition"
           >
-            تسجيل الدخول
+            {isRegister ? (
+              <>
+                <UserPlus className="h-5 w-5" />
+                إنشاء حساب مطعم
+              </>
+            ) : (
+              <>
+                <LogIn className="h-5 w-5" />
+                تسجيل الدخول
+              </>
+            )}
           </Button>
 
-          {error && (
-            <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
-          )}
+          {error && <p className="text-rose-300 text-sm mt-2">{error}</p>}
+
+          <div className="text-center mt-3">
+            {isRegister ? (
+              <span
+                className="text-emerald-300 cursor-pointer font-semibold hover:text-emerald-200 transition"
+                onClick={() => setIsRegister(false)}
+              >
+                لديك حساب بالفعل؟ تسجيل الدخول
+              </span>
+            ) : (
+              <span
+                className="text-emerald-300 cursor-pointer font-semibold hover:text-emerald-200 transition"
+                onClick={() => setIsRegister(true)}
+              >
+                ليس لديك حساب؟ إنشاء حساب مطعم
+              </span>
+            )}
+          </div>
         </form>
+
+        <p className="mt-4 text-center text-xs text-white/60">
+          فقط المطاعم المعتمدة يمكنها الدخول
+        </p>
       </div>
     </div>
   );

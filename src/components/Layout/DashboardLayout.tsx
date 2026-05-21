@@ -1,4 +1,3 @@
-
 import React, { ReactNode, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Sidebar from './Sidebar';
@@ -18,17 +17,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) =>
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white dark:from-slate-900 dark:to-slate-800" dir="rtl">
       <TopBar toggleSidebar={toggleSidebar} />
       
       <div className="flex h-[calc(100vh-64px)]">
-        <Sidebar isOpen={isSidebarOpen} />
+        <Sidebar open={isSidebarOpen} />
         
-        <main className={`flex-1 p-6 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} overflow-auto`}>
+        <main className={`flex-1 p-6 mt-16 transition-all duration-300 ${isSidebarOpen ? 'mr-64' : 'mr-20'} overflow-auto`}>
           {title && (
-            <div className="mb-6">
-              <h1 className="text-2xl font-semibold text-gray-800">{title}</h1>
-              <p className="text-sm text-gray-500 mt-1">
+            <div className="mb-6 text-right">
+              <h1 className="text-2xl font-semibold text-gray-800 dark:text-slate-100">{title}</h1>
+              <p className="text-sm text-gray-500 mt-1 dark:text-slate-400">
                 {user?.role === 'admin' ? 'Admin Dashboard' : 'Restaurant Dashboard'}
               </p>
             </div>

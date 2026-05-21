@@ -83,7 +83,7 @@ const LoginForm: React.FC = () => {
             <Heart className="h-8 w-8 text-white fill-white" />
           </div>
           <h1 className="text-3xl font-black text-white">Providing Food</h1>
-          <p className="text-white/90 mt-2">Admin Portal</p>
+          <p className="text-white/90 mt-2">Assembly control panel Admin</p>
         </div>
 
         <Form {...form}>
@@ -93,7 +93,7 @@ const LoginForm: React.FC = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white/90 font-semibold">Email Address</FormLabel>
+                  <FormLabel className="text-white/90 font-semibold">Email </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="admin@example.com"
@@ -145,15 +145,7 @@ const LoginForm: React.FC = () => {
               )}
             </Button>
 
-            <p className="text-center text-sm text-white/70 mt-6">
-              Don't have an account?{' '}
-              <span
-                className="text-emerald-300 cursor-pointer font-semibold hover:text-emerald-200 transition"
-                onClick={() => navigate("/register")}
-              >
-                Create one
-              </span>
-            </p>
+   
           </form>
         </Form>
       </div>

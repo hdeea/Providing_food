@@ -4,9 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { ReactNode } from "react";
+import { ComponentType, ReactNode } from "react";
 import ChallengesPage from "./pages/Chellenge/ChallengesPage";
-import ChallengeDetailsPage from "./pages/Chellenge/ChallengeDetailsPage";
 
 // Main Pages
 import Index from "./pages/Index";
@@ -14,7 +13,6 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
-import RestaurantsPage from "./pages/Admin/RestaurantsPage";
 import BeneficiariesPage from "./pages/Admin/BeneficiariesPage";
 import AssociationDashboard from "./pages/Admin/AssociationDashboard";
 import { VouchersAdmin } from "./pages/Admin/VouchersAdmin";
@@ -26,10 +24,13 @@ import { getAllBeneficiaryRequests } from "@/api/Admin/Beneficiary/getAllBenefic
 import { approveBeneficiaryRequest } from "@/api/Admin/Beneficiary/approveBeneficiaryRequest";
 import { rejectBeneficiaryRequest } from "@/api/Admin/Beneficiary/rejectBeneficiaryRequest";
 import AdminPendingRequestsPage from "@/pages/Admin/AdminPendingRequestsPage";
+import SeasonItemsPage from "@/pages/Admin/Season/SeasonItemsPage";
 // Restaurant Pages
-import DashboardPage from "./pages/Restaurant/DashboardPage";
+import DashboardPage from "./pages/Restaurant/RestaurantDashboard";
 import RestaurantLogin from "./pages/Auth/RestaurantLogin";
-
+import RestaurantRequestsPage from "./pages/Admin/Restaurant/AdminRestaurantRequestsTable";
+import MyDonationsPage from "./pages/Restaurant/MyDonationsPage";
+import AddDonationPage from "./pages/Restaurant/AddDonationPage";
 // Store Pages
 import FoodStoreLayout from "./pages/Stores/FoodStoreLayout";
 import StoreLogin from "./pages/Auth/StoreLogin";
@@ -55,6 +56,9 @@ import DonateGift from "./pages/Donor/DonateGift";
 import DonorPoints from "./pages/Donor/DonorPoints";
 import Winners from "./pages/Donor/Winners";
 
+import ChallengeStatus from "@/pages/Donor/ChallengeStatus";
+
+import ChallengeDetailsPage from "@/pages/Chellenge/ChallengeDetailsPage";
 
 // Layouts
 import DashboardLayout from "./components/Layout/DashboardLayout";
@@ -71,6 +75,12 @@ import AdminChallengesPage from "./pages/Admin/Chellenge/AdminChallengePage";
 import ChallengeViewPage from "./pages/Admin/Chellenge/ChallengeViewPage";
 import EditChallengePage from "./pages/Admin/Chellenge/EditChallengePage";
 import CreateChallengePage from "./pages/Admin/Chellenge/CreateChallengePage";
+import PostsPage from "./pages/Restaurant/PostsPage";
+import SendJoinRequestPage from "./pages/Restaurant/SendJoinRequestPage";
+import RestaurantDashboard from "./pages/Restaurant/RestaurantDashboard";
+import RestaurantLayout from "./pages/Restaurant/RestaurantLayout";
+import RamadanChallengeHome from "./pages/Donor/RamadanChallengeHome";
+import SeasonManagementPage from "./pages/Admin/Season/SeasonManagement";
 // Protected Route
 const ProtectedRoute = ({
   children,
@@ -146,6 +156,8 @@ const App = () => (
 <Route path="/challenges/:id" element={<ChallengeDetailsPage />} />
 <Route path="/donor/login" element={<DonorLogin />} />
 
+<Route path="/donor/status" element={<ChallengeStatus />} />
+<Route path="/donor/winners/:id" element={<Winners />} />
 
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
@@ -155,6 +167,7 @@ const App = () => (
             {/* Donor (Individual) */}
             <Route path="/individual/donate" element={<DonorRegistrationPage />} />
             <Route path="/individual/track-donations" element={<TrackDonationsPage />} />
+<Route path="/donor/ramadan" element={<RamadanChallengeHome />} />
 
 
 <Route path="/donor/donate" element={<DonorDonateOptions />} />
@@ -180,14 +193,7 @@ const App = () => (
                 </AdminRoute>
               }
             />
-            <Route
-              path="/admin/restaurants"
-              element={
-                <AdminRoute>
-                  <RestaurantsPage />
-                </AdminRoute>
-              }
-            />
+            
             <Route
               path="/admin/stores"
               element={
@@ -201,6 +207,16 @@ const App = () => (
               element={
                 <AdminRoute>
                   <BeneficiariesPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/restaurants"
+              element={
+                <AdminRoute>
+                  <DashboardLayout title="Restaurant Requests">
+                    <RestaurantRequestsPage />
+                  </DashboardLayout>
                 </AdminRoute>
               }
             />
@@ -259,24 +275,58 @@ const App = () => (
   path="/admin/challenges/:id"
   element={
     <AdminRoute>
-      <ChallengeViewPage />
+      <ChallengeDetailsPage />
     </AdminRoute>
   }
 />
 
+<Route path="/admin/seasons" element={<SeasonManagementPage />} />
+<Route path="/admin/seasons/:id/items" element={<SeasonItemsPage />} />
 
 
             {/* Restaurant Routes */}
-            <Route path="/restaurant/login" element={<RestaurantLogin />} />
-            <Route
-              path="/restaurant/dashboard"
-              element={
-                <RestaurantRoute>
-                  <FoodStoreLayout />
-                </RestaurantRoute>
-              }
-            />
-<Route path="/admin/pending" element={<AdminPendingRequestsPage />} />
+<Route path="/restaurant/login" element={<RestaurantLogin />} />
+<Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
+<Route
+  path="/restaurant/donations/add"
+  element={
+    <RestaurantRoute>
+      <RestaurantLayout>
+        <AddDonationPage />
+      </RestaurantLayout>
+    </RestaurantRoute>
+  }
+/>
+
+<Route
+  path="/restaurant/donations"
+  element={
+      <RestaurantLayout>
+        <MyDonationsPage />
+      </RestaurantLayout>
+  }
+/>
+
+  <Route path="/restaurant/join-request" element={<SendJoinRequestPage />} />
+
+<Route
+  path="/restaurant/posts"
+  element={
+      <RestaurantLayout>
+        <PostsPage />
+      </RestaurantLayout>
+  }
+/>
+<Route
+  path="/restaurant/scan"
+  element={
+    <RestaurantRoute>
+      <RestaurantLayout>
+        <ScanVoucher />
+      </RestaurantLayout>
+    </RestaurantRoute>
+  }
+/>
 
             {/* Shelter Routes */}
             <Route path="/shelter/login" element={<ShelterLogin />} />

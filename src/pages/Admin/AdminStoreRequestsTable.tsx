@@ -11,7 +11,6 @@ const handleApprove = async (id: number) => {
   try {
     await approveStoreRequest(id);
 
-    // تحديث الجدول مباشرة بدون Refresh
     setRequests((prev) => prev.filter((r) => r.requestId !== id));
 
     alert("تمت الموافقة على الطلب");

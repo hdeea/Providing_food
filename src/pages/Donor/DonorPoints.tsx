@@ -3,13 +3,21 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function DonorPoints() {
   const { user } = useAuth();
-  const [points, setPoints] = useState(0);
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    fetch(`/api/Challenge/get-donor-points/${user?.id}`)
+    if (!user) return;
+
+    fetch(`/api/challenge/my-points`, {
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
       .then((res) => res.json())
-      .then((data) => setPoints(data.points || 0));
-  }, []);
+      .then((d) => setData(d));
+  }, [user]);
+
+  if (!data) return <p>تحميل...</p>;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-emerald-700">
@@ -18,7 +26,15 @@ export default function DonorPoints() {
           نقاطك الحالية
         </h1>
 
-        <p className="text-5xl font-black text-emerald-900">{points}</p>
+        <p className="text-5xl font-black text-emerald-900">{data.points}</p>
+
+        <p className="mt-4 text-lg text-gray-700">
+          التحدي: {data.challengeName || "لا يوجد تحدي"}
+        </p>
+
+        <p className="text-gray-500">
+          الحالة: {data.challengeStatus}
+        </p>
       </div>
     </div>
   );

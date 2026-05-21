@@ -29,28 +29,33 @@ import { ChallengesInfoModal, ChallengeDetailsModal } from "../pages/Chellenge/c
 export default function Index() {
 
   const [showChallengesModal, setShowChallengesModal] = useState(false);
-const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900" dir="rtl">
+
+      {/* HEADER */}
       <motion.header
         initial={{ y: -70, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
         className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md"
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-6 px-6 py-4">
-          <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto flex flex-row-reverse items-center justify-between gap-6 px-6 py-4">
+
+          {/* LOGO RIGHT */}
+          <div className="flex flex-row-reverse items-center gap-3">
             <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-emerald-700 text-lg font-black text-white shadow-lg shadow-emerald-700/20">
               PF
             </div>
-            <div>
+            <div className="text-right">
               <h1 className="text-2xl font-black tracking-tight">Providing Food</h1>
               <p className="text-xs font-semibold uppercase text-emerald-700">Food Distribution Platform</p>
             </div>
           </div>
 
-          <div className="hidden items-center gap-4 lg:flex">
+          {/* NAV LINKS */}
+          <div className="hidden lg:flex flex-row-reverse items-center gap-4">
             <Link to="/">
               <span className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">Home</span>
             </Link>
@@ -62,15 +67,18 @@ const [showDetailsModal, setShowDetailsModal] = useState(false);
             </a>
           </div>
 
+          {/* LOGIN BUTTON LEFT */}
           <Link to="/login">
             <Button className="rounded-full bg-emerald-700 px-6 py-3 text-sm font-black text-white shadow-lg shadow-emerald-700/30 hover:bg-emerald-800">
               Admin Login
             </Button>
           </Link>
+
         </div>
       </motion.header>
 
       <main>
+
         
 {/* 🌙 تحدي 10 أيام رمضان */}
 <section className="max-w-7xl mx-auto px-6 py-16">
@@ -85,25 +93,20 @@ const [showDetailsModal, setShowDetailsModal] = useState(false);
         </p>
 
        <div className="mt-8 flex flex-wrap gap-4">
-  <Button
-    className="rounded-full bg-white text-emerald-900 px-8 py-4 font-black shadow-lg hover:bg-slate-100"
-    onClick={() => setShowChallengesModal(true)}
-  >
-    عرض التحديات
-  </Button>
+ 
 
-  <Button
-    className="rounded-full border border-white/40 bg-white/10 px-8 py-4 font-black text-white shadow-lg hover:bg-white/20"
-    onClick={() => setShowDetailsModal(true)}
-  >
+ <Link to="/donor/ramadan">
+  <Button className="rounded-full border border-white/40 bg-white/10 px-8 py-4 font-black text-white shadow-lg hover:bg-white/20">
     تفاصيل التحدي
   </Button>
+</Link>
 
-  <Link to="/login">
-    <Button className="rounded-full bg-emerald-900 px-8 py-4 font-black text-white shadow-lg hover:bg-emerald-800">
-      تبرع الآن
-    </Button>
-  </Link>
+<Link to="/donor/login">
+  <Button className="rounded-full bg-emerald-900 px-8 py-4 font-black text-white shadow-lg hover:bg-emerald-800">
+    تبرع الآن
+  </Button>
+</Link>
+
 </div>
 
       </div>
@@ -438,7 +441,7 @@ const [showDetailsModal, setShowDetailsModal] = useState(false);
             </div>
 
             <div>
-              <h4 className="mb-5 text-sm font-black uppercase tracking-[0.2em] text-emerald-300">Contact Us</h4>
+              <h4 className="mb-5 text-sm font-black uppercase tracking-[0.2emAssembly control panel] text-emerald-300">Contact Us</h4>
               <ul className="space-y-4 text-sm text-slate-400">
                 <li className="flex items-start gap-3">
                   <MapPin className="mt-1 h-4 w-4 text-emerald-300" />

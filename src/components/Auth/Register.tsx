@@ -23,7 +23,7 @@ export function Register() {
     try {
       await registerUser({
         ...form,
-        role: roleMap[form.role],   // ⭐ أهم سطر
+        role: roleMap[form.role], 
       });
 
       alert("تم إنشاء الحساب بنجاح");

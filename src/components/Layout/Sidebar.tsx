@@ -1,86 +1,53 @@
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Utensils,
+  Store,
+  User,
+  Home,
+  Gift,
+  Ticket,
+} from "lucide-react";
+import { CalendarRange } from "lucide-react";
 
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { User, Utensils, LayoutDashboard, Ticket, Store, Gift, Home } from 'lucide-react';
-
-interface SidebarProps {
-  isOpen: boolean;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
+const Sidebar = ({ open }) => {
   const location = useLocation();
-  const { user } = useAuth();
 
   const adminLinks = [
-    {
-      name: 'لوحة التحكم',
-      path: '/admin',
-      icon: <LayoutDashboard size={20} />, 
-    },
-    {
-      name: 'المطاعم',
-      path: '/admin/restaurants',
-      icon: <Utensils size={20} />, 
-    },
-    {
-      name: 'المتاجر',
-      path: '/admin/stores',
-      icon: <Store size={20} />, 
-    },
-    {
-      name: 'المستفيدون',
-      path: '/admin/beneficiaries',
-      icon: <User size={20} />, 
-    },
-    {
-      name: 'الملاجئ',
-      path: '/admin/shelters',
-      icon: <Home size={20} />, 
-    },
-    {
-      name: 'الاهداءات',
-      path: '/admin/gift-donations',
-      icon: <Gift size={20} />, 
-    },
-    {
-      name: 'القسائم',
-      path: '/admin/vouchers',
-      icon: <Ticket size={20} />, 
-    },
+    { name: "لوحة التحكم", path: "/admin", icon: <LayoutDashboard size={20} /> },
+    { name: "طلبات المطاعم", path: "/admin/restaurants", icon: <Utensils size={20} /> },
+    { name: "المتاجر", path: "/admin/stores", icon: <Store size={20} /> },
+    { name: "المستفيدون", path: "/admin/beneficiaries", icon: <User size={20} /> },
+    { name: "الملاجئ", path: "/admin/shelters", icon: <Home size={20} /> },
+    { name: "الإهداءات", path: "/admin/gift-donations", icon: <Gift size={20} /> },
+    { name: "القسائم", path: "/admin/vouchers", icon: <Ticket size={20} /> },
+    { name: "المواسم", path: "/admin/seasons", icon: <CalendarRange size={20} /> },
+
   ];
-
-  const restaurantLinks = [
-    {
-      name: 'Dashboard',
-      path: '/restaurant',
-      icon: <Utensils size={20} />,
-    },
-  ];
-
-  const links = user?.role === 'admin' ? adminLinks : restaurantLinks;
-
-  if (!isOpen) return null;
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-full fixed left-0 z-10 transition-all duration-300">
-      <div className="p-4">
-        <h2 className="text-lg font-medium text-brand-blue mb-6">القــائمة</h2>
-        <nav className="space-y-1">
-          {links.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`sidebar-item ${
-                location.pathname === link.path ? 'sidebar-item-active' : ''
+    <aside
+      className={`h-[calc(100vh-64px)] bg-white border-l border-gray-200 fixed right-0 top-16 z-30 transition-all duration-300 dark:bg-slate-900 dark:border-slate-700
+      ${open ? "w-64" : "w-20"}`}
+    >
+      <nav className="p-4 space-y-1">
+        {adminLinks.map((link) => (
+          <Link
+            key={link.path}
+            to={link.path}
+            className={`flex items-center justify-end gap-3 px-4 py-2 rounded-lg transition 
+              ${
+                location.pathname === link.path
+                  ? "bg-emerald-100 text-emerald-700 font-semibold dark:bg-emerald-900 dark:text-emerald-300"
+                  : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
               }`}
-            >
-              {link.icon}
-              <span>{link.name}</span>
-            </Link>
-          ))}
-        </nav>
-      </div>
+          >
+            {open && <span>{link.name}</span>}
+            {link.icon}
+          </Link>
+        ))}
+      </nav>
     </aside>
   );
 };

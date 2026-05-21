@@ -24,12 +24,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from sessionStorage
+  // Load user + token from sessionStorage
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const storedToken = sessionStorage.getItem("token");
+
+    if (storedUser && storedToken) {
+      const parsed = JSON.parse(storedUser);
+      parsed.token = storedToken;
+      setUser(parsed);
     }
+
     setIsLoading(false);
   }, []);
 
@@ -64,7 +69,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else if (data.userTypeId === 5) role = "store owner";
       else if (data.userTypeId === 6) role = "beneficiary";
 
-      // Add shelter fields returned from backend
       const mappedUser: User = {
         id: data.userId,
         fullName: data.fullName,
@@ -72,11 +76,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: role,
         token: data.token,
         userTypeId: data.userTypeId,
-       
       };
 
+      // Save user + token
       setUser(mappedUser);
       sessionStorage.setItem("user", JSON.stringify(mappedUser));
+      sessionStorage.setItem("token", data.token);
       sessionStorage.setItem("justLoggedIn", "true");
 
       return mappedUser;
@@ -104,19 +109,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       // Auto-login after register
-      const loggedIn = await login(email, password);
-      return loggedIn;
+      return await login(email, password);
     } catch (error) {
       console.error("AuthContext register error:", error);
       return null;
     }
   };
 
+  // ---------------- REFRESH USER ----------------
   const refreshUser = async (): Promise<User | null> => {
-    if (!user?.token) return null;
+    const token = sessionStorage.getItem("token");
+    if (!token) return null;
 
     try {
-      const data = await getUserProfile(user.token);
+      const data = await getUserProfile(token);
+
       let role:
         | "admin"
         | "restaurant"
@@ -138,13 +145,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fullName: data.fullName,
         email: data.email,
         role: role,
-        token: user.token,
+        token: token,
         userTypeId: data.userTypeId,
-  
       };
 
       setUser(mappedUser);
       sessionStorage.setItem("user", JSON.stringify(mappedUser));
+
       return mappedUser;
     } catch (error) {
       console.error("AuthContext refreshUser error:", error);
@@ -156,6 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
   };
 
   return (

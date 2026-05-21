@@ -4,11 +4,13 @@ import { StoreRequests } from "@/types";
 import { getAllStoreRequests } from "@/api/Admin/getAllStoreRequests";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle, XCircle, Clock, Store, MapPin, Phone, Package, Calendar } from "lucide-react";
 
 export default function AdminAllStoreRequestsTable() {
   const [requests, setRequests] = useState<StoreRequests[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,6 +62,10 @@ export default function AdminAllStoreRequestsTable() {
   const pendingCount = requests.filter(r => r.status.toLowerCase() === 'pending').length;
   const approvedCount = requests.filter(r => r.status.toLowerCase() === 'approved').length;
   const rejectedCount = requests.filter(r => r.status.toLowerCase() === 'rejected').length;
+  const filteredRequests =
+    statusFilter === 'all'
+      ? requests
+      : requests.filter((r) => r.status.toLowerCase() === statusFilter);
 
   if (loading) {
     return (
@@ -74,6 +80,44 @@ export default function AdminAllStoreRequestsTable() {
 
   return (
     <div className="space-y-6">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">Store Requests</h1>
+            <p className="text-sm text-slate-500 mt-1">عرض الطلبات حسب الحالة</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: 'Pending', value: 'pending', count: pendingCount },
+              { label: 'Approved', value: 'approved', count: approvedCount },
+              { label: 'Rejected', value: 'rejected', count: rejectedCount },
+              { label: 'All', value: 'all', count: requests.length },
+            ].map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setStatusFilter(option.value as any)}
+                className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                  statusFilter === option.value
+                    ? 'bg-slate-900 text-white shadow-lg'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {option.label} ({option.count})
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <Tabs defaultValue={statusFilter} value={statusFilter} className="w-full" onValueChange={(value) => setStatusFilter(value as any)}>
+        <TabsList className="grid w-full max-w-4xl grid-cols-4 gap-2">
+          <TabsTrigger value="pending">Pending ({pendingCount})</TabsTrigger>
+          <TabsTrigger value="approved">Approved ({approvedCount})</TabsTrigger>
+          <TabsTrigger value="rejected">Rejected ({rejectedCount})</TabsTrigger>
+          <TabsTrigger value="all">All ({requests.length})</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-4 gap-3">
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
@@ -117,7 +161,7 @@ export default function AdminAllStoreRequestsTable() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {requests.map((req) => (
+                {filteredRequests.map((req) => (
                   <TableRow key={req.requestId} className="border-b border-slate-100 hover:bg-slate-50 transition">
                     <TableCell className="font-black text-slate-900">#{req.requestId}</TableCell>
                     <TableCell className="text-slate-700 font-semibold">{req.storeName}</TableCell>
