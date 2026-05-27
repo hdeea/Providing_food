@@ -14,17 +14,21 @@ import { CalendarRange } from "lucide-react";
 const Sidebar = ({ open }) => {
   const location = useLocation();
 
-  const adminLinks = [
-    { name: "لوحة التحكم", path: "/admin", icon: <LayoutDashboard size={20} /> },
-    { name: "طلبات المطاعم", path: "/admin/restaurants", icon: <Utensils size={20} /> },
-    { name: "المتاجر", path: "/admin/stores", icon: <Store size={20} /> },
-    { name: "المستفيدون", path: "/admin/beneficiaries", icon: <User size={20} /> },
-    { name: "الملاجئ", path: "/admin/shelters", icon: <Home size={20} /> },
-    { name: "الإهداءات", path: "/admin/gift-donations", icon: <Gift size={20} /> },
-    { name: "القسائم", path: "/admin/vouchers", icon: <Ticket size={20} /> },
-    { name: "المواسم", path: "/admin/seasons", icon: <CalendarRange size={20} /> },
+const adminLinks = [
+  { name: "لوحة التحكم", path: "/admin", icon: <LayoutDashboard size={20} /> },
+  { name: "طلبات المطاعم", path: "/admin/restaurants", icon: <Utensils size={20} /> },
+  { name: "المتاجر", path: "/admin/stores", icon: <Store size={20} /> },
+  { name: "المستفيدون", path: "/admin/beneficiaries", icon: <User size={20} /> },
+  { name: "الملاجئ", path: "/admin/shelters", icon: <Home size={20} /> },
 
-  ];
+  { name: "سعر السند", path: "/admin/gift-bond/price", icon: <Gift size={20} /> },
+  { name: " الإهداءات", path: "/admin/gift-bond/donations", icon: <Gift size={20} /> },
+
+  { name: "القسائم", path: "/admin/vouchers", icon: <Ticket size={20} /> },
+  { name: "المواسم", path: "/admin/seasons", icon: <CalendarRange size={20} /> },
+  {name: "سندات الطعام", path: "/admin/food-bonds", icon: <Gift size={20} /> }
+];
+
 
   return (
     <aside

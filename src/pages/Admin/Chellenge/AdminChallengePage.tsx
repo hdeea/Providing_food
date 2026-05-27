@@ -2,94 +2,168 @@ import { useEffect, useState } from "react";
 import { getAllChallenges } from "@/api/Admin/challenge/getAllChallenges";
 import { deleteChallenge } from "@/api/Admin/challenge/deleteChallenge";
 import { useNavigate } from "react-router-dom";
+import { Power, PowerOff } from "lucide-react";
+import { activateChallenge } from "@/api/Admin/challenge/activateChallenge";
+import { endChallenge } from "@/api/Admin/challenge/endChallenge";
 
 export default function AdminChallengesPage() {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+const [refresh, setRefresh] = useState(false);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
 
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const activeChallenge = challenges.find((x: any) => x.isActive);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getAllChallenges();
-        setChallenges(data || []);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
+const handleActivate = async (id: number) => {
+  const activeChallenge = challenges.find((x: any) => x.isActive);
 
-  if (loading) return <div className="p-6">جاري تحميل التحديات...</div>;
+  if (activeChallenge && activeChallenge.id !== id) {
+    setMessage({
+      type: "error",
+      text: "لا يمكن تفعيل أكثر من تحدي في نفس الوقت"
+    });
+
+    setTimeout(() => setMessage(null), 3000);
+    return;
+  }
+
+  await activateChallenge(id);
+  setRefresh(prev => !prev);
+};
+
+
+const handleEnd = async (id: number) => {
+  await endChallenge(id);
+  setRefresh(prev => !prev);
+};
+
+useEffect(() => {
+  const load = async () => {
+    try {
+      const data = await getAllChallenges();
+      setChallenges(data || []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  load();
+}, [refresh]); 
+
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
 
-      {/* عنوان الصفحة */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-slate-900">Challenges Management</h1>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">
+            إدارة التحديات
+          </h1>
+
+          <p className="text-slate-500 text-sm mt-1">
+            إدارة التحديات: إنشاء، تعديل، وحذف التحديات بسهولة 
+          </p>
+        </div>
 
         <button
           onClick={() => navigate("/admin/challenges/create")}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold shadow hover:bg-emerald-700 transition"
+          className="
+            inline-flex items-center gap-2
+            px-4 py-2
+            rounded-xl
+            bg-emerald-500
+            text-white
+            text-sm font-medium
+            hover:bg-emerald-600
+            transition
+            shadow-sm
+          "
         >
-          <span className="text-lg">＋</span>
-          <span>Create Challenge</span>
+          <span className="text-base">＋</span>
+          <span>إضافة تحدي</span>
         </button>
+
       </div>
 
-      {/* رسالة داخل الصفحة */}
+      {/* Message */}
       {message && (
         <div
           className={`
-            p-4 rounded-xl font-semibold text-center
-            ${message.type === "success"
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-red-100 text-red-700"}
+            rounded-2xl px-4 py-3 text-sm font-medium border
+            ${
+              message.type === "success"
+                ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                : "bg-rose-50 text-rose-700 border-rose-100"
+            }
           `}
         >
           {message.text}
         </div>
       )}
 
-      {/* البحث + الفلترة */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+      {/* Search + Filter */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
 
-        <input
-          type="text"
-          placeholder="ابحث عن تحدي..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full md:w-1/3 px-4 py-2 border rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500"
-        />
+        <div className="flex flex-col md:flex-row gap-4">
 
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="px-4 py-2 border rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500"
-        >
-          <option value="all">الكل</option>
-          <option value="active">نشط</option>
-          <option value="inactive">غير نشط</option>
-        </select>
+          <input
+            type="text"
+            placeholder="ابحث عن تحدي..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="
+              flex-1
+              px-4 py-3
+              rounded-2xl
+              border border-slate-200
+              bg-slate-50
+              focus:outline-none
+              focus:ring-2
+              focus:ring-emerald-200
+              text-sm
+            "
+          />
 
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="
+              px-4 py-3
+              rounded-2xl
+              border border-slate-200
+              bg-slate-50
+              focus:outline-none
+              focus:ring-2
+              focus:ring-emerald-200
+              text-sm
+            "
+          >
+            <option value="all">الكل</option>
+            <option value="active">نشط</option>
+            <option value="inactive">غير نشط</option>
+          </select>
+
+        </div>
       </div>
 
-      {/* الكروت */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+
         {challenges
-          .filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
-          .filter((c) =>
+          .filter((c: any) =>
+            c.name.toLowerCase().includes(search.toLowerCase())
+          )
+          .filter((c: any) =>
             filter === "all"
               ? true
               : filter === "active"
@@ -97,155 +171,206 @@ export default function AdminChallengesPage() {
               : !c.isActive
           )
           .map((c: any) => (
+
             <div
               key={c.id}
               className="
-                bg-gradient-to-br from-white/80 to-white/60 
-                backdrop-blur-xl 
-                border border-white/30 
-                rounded-2xl 
-                shadow-[0_8px_30px_rgba(0,0,0,0.05)]
-                hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)]
-                transition-all 
-                p-6 space-y-4
+                bg-white
+                border border-slate-200
+                rounded-3xl
+                shadow-sm
+                hover:shadow-md
+                transition-all duration-300
+                p-5 space-y-4
               "
             >
-              {/* العنوان + الحالة */}
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-slate-800">{c.name}</h2>
+
+              {/* Header */}
+              <div className="flex justify-between items-start">
+
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">
+                    {c.name}
+                  </h2>
+
+                  <p className="text-sm text-slate-500 mt-1">
+                    مدة التحدي{" "}
+                    {Math.ceil(
+                      (new Date(c.endDate).getTime() -
+                        new Date(c.startDate).getTime()) /
+                        (1000 * 60 * 60 * 24)
+                    )}{" "}
+                    يوم
+                  </p>
+                </div>
 
                 <span
                   className={`
-                    px-3 py-1 rounded-full text-xs font-semibold
-                    ${c.isActive ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}
+                    px-3 py-1 rounded-full text-[11px] font-medium
+                    ${
+                      c.isActive
+                        ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                        : "bg-slate-100 text-slate-500 border border-slate-200"
+                    }
                   `}
                 >
                   {c.isActive ? "نشط" : "غير نشط"}
                 </span>
               </div>
 
-              {/* عدد الأيام */}
-              <p className="text-slate-700 mt-3">
-                <strong>عدد الأيام:</strong>{" "}
-                {Math.ceil(
-                  (new Date(c.endDate).getTime() - new Date(c.startDate).getTime()) /
-                    (1000 * 60 * 60 * 24)
-                )}
-              </p>
+              {/* Dates */}
+              <div className="space-y-2 text-sm text-slate-600">
 
-              {/* تاريخ البداية */}
-              <p className="text-slate-700">
-                <strong>تاريخ البداية:</strong> {c.startDate}
-              </p>
+                <div className="flex items-center justify-between">
+                  <span>تاريخ البداية</span>
 
-              {/* تاريخ النهاية */}
-              <p className="text-slate-700">
-                <strong>تاريخ النهاية:</strong> {c.endDate}
-              </p>
+                  <span className="font-medium text-slate-800">
+                    {c.startDate}
+                  </span>
+                </div>
 
-              {/* الأزرار */}
-              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span>تاريخ النهاية</span>
 
-                {/* عرض التفاصيل */}
-                <button
-                  onClick={() => navigate(`/admin/challenges/${c.id}`)}
-                  className="
-                    w-full py-2.5 rounded-xl font-semibold
-                    bg-emerald-600 text-white
-                    hover:bg-emerald-700
-                    transition-all duration-200
-                    shadow-sm hover:shadow-md
-                  "
-                >
-                  عرض التفاصيل
-                </button>
+                  <span className="font-medium text-slate-800">
+                    {c.endDate}
+                  </span>
+                </div>
 
-                {/* ⭐ عرض المتصدرين */}
-                <button
-                  onClick={() => navigate(`/donor/winners/${c.id}`)}
-                  className="
-                    w-full py-2.5 rounded-xl font-semibold
-                    bg-yellow-500 text-white
-                    hover:bg-yellow-600
-                    transition-all duration-200
-                    shadow-sm hover:shadow-md
-                  "
-                >
-                  ⭐ عرض المتصدرين
-                </button>
+              </div>
 
-                {/* تعديل */}
+              {/* Buttons */}
+              <div className="flex gap-2 pt-2">
+
+              <button
+  onClick={() => {
+    if (c.isActive) {
+      handleEnd(c.id);
+    } else {
+      handleActivate(c.id);
+    }
+  }}
+  className={`
+    flex-1 flex items-center justify-center gap-2 rounded-xl py-2 transition border
+    ${c.isActive
+      ? "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+      : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+    }
+  `}
+>
+  {c.isActive ? <PowerOff size={16} /> : <Power size={16} />}
+  {c.isActive ? "إيقاف" : "تفعيل"}
+</button>
+
+
+                {/* Edit */}
                 <button
                   onClick={() => navigate(`/admin/challenges/edit/${c.id}`)}
                   className="
-                    w-full py-2.5 rounded-xl font-semibold
-                    bg-blue-600 text-white
-                    hover:bg-blue-700
-                    transition-all duration-200
-                    shadow-sm hover:shadow-md
+                    flex-1 py-2 rounded-xl
+                    bg-blue-50
+                    text-blue-700
+                    text-sm font-semibold
+                    hover:bg-blue-100
+                    transition
                   "
                 >
-                  تعديل التحدي
+                  تعديل
                 </button>
 
-                {/* حذف */}
+                {/* Delete */}
                 <button
                   onClick={() => setDeleteTarget(c.id)}
                   className="
-                    w-full py-2.5 rounded-xl font-semibold
-                    bg-red-600 text-white
-                    hover:bg-red-700
-                    transition-all duration-200
-                    shadow-sm hover:shadow-md
+                    px-4 py-2 rounded-xl
+                    bg-rose-50
+                    text-rose-700
+                    text-sm font-semibold
+                    hover:bg-rose-100
+                    transition
                   "
                 >
-                  حذف التحدي
+                  حذف
                 </button>
 
               </div>
+
             </div>
           ))}
       </div>
 
-      {/* 🔥 Modal الحذف */}
+      {/* Delete Modal */}
       {deleteTarget !== null && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+
+          <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-xl">
 
             <h2 className="text-xl font-bold text-slate-800 text-center">
-              هل أنتِ متأكدة من حذف هذا التحدي؟
+              حذف التحدي
             </h2>
 
-            <p className="text-center text-slate-600">
-              لا يمكن التراجع عن هذه العملية بعد تنفيذها.
+            <p className="text-center text-slate-500 mt-3 leading-relaxed">
+              هل أنتِ متأكدة من حذف هذا التحدي؟
+              <br />
+              لا يمكن التراجع بعد الحذف.
             </p>
 
-            <div className="flex gap-4 mt-6">
+            <div className="flex gap-3 mt-6">
+
               <button
                 onClick={async () => {
                   try {
                     const msg = await deleteChallenge(deleteTarget);
-                    setMessage({ type: "success", text: msg });
-                    setChallenges(prev => prev.filter(x => x.id !== deleteTarget));
+
+                    setMessage({
+                      type: "success",
+                      text: msg,
+                    });
+
+                    setChallenges((prev) =>
+                      prev.filter((x: any) => x.id !== deleteTarget)
+                    );
+
                   } catch {
-                    setMessage({ type: "error", text: "حدث خطأ أثناء الحذف" });
+                    setMessage({
+                      type: "error",
+                      text: "حدث خطأ أثناء الحذف",
+                    });
                   }
+
                   setDeleteTarget(null);
-                  setTimeout(() => setMessage(null), 3000);
+
+                  setTimeout(() => {
+                    setMessage(null);
+                  }, 3000);
                 }}
-                className="w-full py-2.5 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 transition"
+                className="
+                  flex-1 py-2.5 rounded-2xl
+                  bg-rose-500
+                  text-white
+                  text-sm font-semibold
+                  hover:bg-rose-600
+                  transition
+                "
               >
-                نعم، احذفيه
+                حذف
               </button>
 
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="w-full py-2.5 rounded-xl font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition"
+                className="
+                  flex-1 py-2.5 rounded-2xl
+                  bg-slate-100
+                  text-slate-700
+                  text-sm font-semibold
+                  hover:bg-slate-200
+                  transition
+                "
               >
                 إلغاء
               </button>
-            </div>
 
+            </div>
           </div>
         </div>
       )}

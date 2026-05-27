@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/Layout/DashboardLayout';
-import VouchersList from '../../components/Vouchers/VouchersList';
 import IndividualRequestsTable from '../../components/Individual/IndividualRequestsTable';
 import IndividualDonorsTable from '../../components/Individual/IndividualDonorsTable';
-import VoucherIssuanceForm from '../../components/Vouchers/VoucherIssuanceForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { VoucherIssuance, HelpRequest, DonationIndividualDto } from '../../types/individual';
@@ -11,7 +9,8 @@ import { Heart, Ticket, Users, UserPlus, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getIndividualDonations } from '../../api/getDonationIndividuals';
 import { updateDonationStatus } from '../../api/updateDonationStatus';
-import { fetchAllFoodVouchers } from '@/api/foodVoucher/getAllVouchers';
+import { fetchAllFoodBonds } from '../../api/Admin/FoodBond/getallfoodBond';
+import { getallFoodBonds } from '../../api/Admin/FoodBond/getallfoodBond';
 import AdminStoreRequestsTable from "@/pages/Admin/AdminStoreRequestsTable";
 import AdminAllStoreRequestsTable from "./AdminAllStoreRequestsTable";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +22,13 @@ import { approveBeneficiaryRequest } from "@/api/Admin/Beneficiary/approveBenefi
 import { rejectBeneficiaryRequest } from "@/api/Admin/Beneficiary/rejectBeneficiaryRequest";
 import RequestsCards from "@/components/Requests/RequestsCards";
 import { getAllRestaurantRequests } from '@/api/Admin/Restaurant/getAllRequests';
-
+import {
+  Building2,
+  Store,
+  Home,
+  Trophy,
+  LayoutDashboard,
+} from "lucide-react";
 const AssociationDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [vouchers, setVouchers] = useState<VoucherIssuance[]>([]);
@@ -71,17 +76,17 @@ useEffect(() => {
   const totalRejectedCount = rejectedHelpRequestsCount + rejectedDonationsCount + rejectedRestaurantRequestsCount;
   const totalPendingCount = pendingHelpRequestsCount + pendingDonationsCount + pendingRestaurants.length;
 
-  //   Vouchers
+  //   Food Bonds
   useEffect(() => {
-    const fetchVouchers = async () => {
+    const fetchFoodBonds = async () => {
       try {
-        const data = await fetchAllFoodVouchers();
+        const data = await getAllFoodBonds();
         setVouchers(data);
       } catch (error) {
-        console.error("Failed to fetch vouchers:", error);
+        console.error("Failed to fetch food bonds:", error);
       }
     };
-    fetchVouchers();
+    fetchFoodBonds();
   }, []);
 
   //  Individual Donations
@@ -184,22 +189,21 @@ useEffect(() => {
     <DashboardLayout title="Association Control Panel">
       <div className="space-y-6">
  {/* زر التحديات */}
-  <button
-    onClick={() => navigate("/admin/challenges")}
-    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold shadow-md hover:bg-emerald-700 transition"
-  >
-    <span>🏆</span>
-    <span>Challenges</span>
-  </button>
+     <div className="flex flex-wrap gap-4 mb-8">
+          <button
+            onClick={() => navigate("/admin/challenges")}
+            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-4 text-white font-bold shadow-xl hover:scale-105 transition-all"
+          >
+            <Trophy className="w-5 h-5" />
+            Challenges
+          </button>
 
-
-<button
-  onClick={() => navigate("/admin/challenges")}
-  className="px-6 py-3 rounded-xl bg-yellow-500 text-white font-bold"
->
-  <span>⭐</span>
-  <span>Leaderboard</span>
-</button>
+          <button
+            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-4 text-white font-bold shadow-xl hover:scale-105 transition-all"
+          >
+            ⭐ Leaderboard
+          </button>
+        </div>
 
 
         {/* ⭐ Statistics Cards */}
@@ -342,9 +346,6 @@ useEffect(() => {
             </TabsTrigger>
             <TabsTrigger value="vouchers" className="flex items-center gap-2 rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-md transition dark:data-[state=active]:bg-slate-600 dark:data-[state=active]:text-emerald-300">
               <Ticket className="w-4 h-4" /> Vouchers
-            </TabsTrigger>
-            <TabsTrigger value="help-requests" className="flex items-center gap-2 rounded-xl data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-md transition dark:data-[state=active]:bg-slate-600 dark:data-[state=active]:text-blue-300">
-              <Users className="w-4 h-4" /> Help Requests
             </TabsTrigger>
           </TabsList>
 
@@ -502,68 +503,7 @@ useEffect(() => {
             </div>
           </TabsContent>
 
-          {/* ⭐ Vouchers */}
-          <TabsContent value="vouchers" className="space-y-6 mt-6">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg dark:border-slate-700 dark:bg-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-800">
-                  <Ticket className="h-6 w-6 text-emerald-700 dark:text-emerald-300" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Food Vouchers Management</h2>
-                  <p className="text-sm text-slate-600 mt-1 dark:text-slate-400">Create, distribute, and monitor food vouchers for beneficiaries</p>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-lg dark:border-slate-700 dark:bg-slate-800">
-                  <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2 dark:text-slate-100">
-                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-600"></span>
-                    Active Vouchers
-                  </h3>
-                  <VouchersList vouchers={vouchers} />
-                </div>
-              </div>
-
-              <div>
-                <div className="rounded-[2rem] border border-emerald-200 bg-emerald-50 p-6 shadow-lg h-full dark:border-emerald-800 dark:bg-emerald-900">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2 dark:text-slate-100">
-                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-600"></span>
-                    Issue New Voucher
-                  </h3>
-                  <VoucherIssuanceForm
-                    onVoucherIssued={(newVoucher) => {
-                      setVouchers((prev) => [newVoucher, ...prev]);
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* ⭐ Help Requests */}
-          <TabsContent value="help-requests" className="mt-6">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg dark:border-slate-700 dark:bg-slate-800">
-              <div className="mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-800">
-                    <Users className="h-6 w-6 text-blue-700 dark:text-blue-300" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Help Requests</h2>
-                    <p className="text-sm text-slate-600 mt-1 dark:text-slate-400">Manage beneficiary assistance requests and review applications</p>
-                  </div>
-                </div>
-              </div>
-              <RequestsCards
-                requests={helpRequests}
-                onStatusChange={handleHelpRequestStatusChange}
-              />
-            </div>
-          </TabsContent>
-
-
+       
         </Tabs>
       </div>
     </DashboardLayout>

@@ -26,7 +26,7 @@ export interface DonationTransaction {
   createdAt: string;
   processedAt?: string;
 }
-export interface VoucherRequest {
+export interface FoodBondsRequest {
   beneficiaryName: string;
   restaurantName: string;
   numberOfMeals: number;
@@ -49,7 +49,7 @@ export interface HelpRequest {
 
 
 // Food voucher issuance type
-export interface VoucherIssuance {
+export interface BondsIssuance {
   id: number;
   beneficiaryName: string;
   restaurantName: string;
@@ -62,7 +62,7 @@ export interface VoucherIssuance {
 
 export interface ScanResult {
   success: boolean;
-  bond: VoucherIssuance;
+  bond: BondsIssuance;
   message?: string;
 }
 export interface FoodBondResponse {

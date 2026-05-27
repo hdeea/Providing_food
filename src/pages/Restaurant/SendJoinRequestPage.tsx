@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Building2, Mail, Phone, MapPin, FileImage } from "lucide-react";
 
 export default function SendJoinRequestPage() {
   const { user } = useAuth();
@@ -10,10 +11,19 @@ export default function SendJoinRequestPage() {
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
   const [licenseImage, setLicenseImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
+
+  const handleImageUpload = (e: any) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLicenseImage(file);
+    setPreview(URL.createObjectURL(file));
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -38,9 +48,9 @@ export default function SendJoinRequestPage() {
       const response = await fetch("/api/Restaurant/join-request", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${user?.token}`
+          Authorization: `Bearer ${user?.token}`,
         },
-        body: formData
+        body: formData,
       });
 
       if (!response.ok) {
@@ -52,10 +62,9 @@ export default function SendJoinRequestPage() {
 
       setMsg("تم إرسال طلب الانضمام بنجاح");
       setTimeout(() => {
-window.location.href = "/restaurant/dashboard";
+        window.location.href = "/restaurant/dashboard";
       }, 1200);
-
-    } catch (err: any) {
+    } catch (err) {
       setError("حدث خطأ أثناء إرسال الطلب");
     }
 
@@ -63,62 +72,142 @@ window.location.href = "/restaurant/dashboard";
   };
 
   return (
-    <div className="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-emerald-200">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 py-10 px-4" dir="rtl">
+      <div className="max-w-xl mx-auto">
 
-      <h1 className="text-2xl font-bold text-emerald-700 mb-6">طلب الانضمام</h1>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-emerald-700 rounded-full mb-3 shadow-lg">
+            <Building2 className="w-7 h-7 text-white" />
+          </div>
+          <h1 className="text-3xl font-black text-slate-900">طلب انضمام مطعم</h1>
+          <p className="text-slate-600 mt-1 text-sm">قم بتعبئة النموذج لإرسال طلب الانضمام</p>
+        </div>
 
-      <div className="space-y-4">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 space-y-6">
 
-        <input
-          className="w-full p-3 border rounded"
-          placeholder="اسم المطعم"
-          value={restaurantName}
-          onChange={(e) => setRestaurantName(e.target.value)}
-        />
+          {/* Restaurant Name */}
+          <div className="space-y-1">
+            <label className="flex items-center gap-2 text-slate-700 font-semibold text-sm">
+              <Building2 className="w-4 h-4 text-emerald-700" />
+              اسم المطعم
+            </label>
+            <input
+              className="w-full p-3 rounded-xl border border-slate-300 focus:border-emerald-600 text-sm"
+              placeholder="مثال: مطعم الشام"
+              value={restaurantName}
+              onChange={(e) => setRestaurantName(e.target.value)}
+            />
+          </div>
 
-        <input
-          className="w-full p-3 border rounded"
-          placeholder="البريد الإلكتروني"
-          value={restaurantEmail}
-          onChange={(e) => setRestaurantEmail(e.target.value)}
-        />
+          {/* Email */}
+          <div className="space-y-1">
+            <label className="flex items-center gap-2 text-slate-700 font-semibold text-sm">
+              <Mail className="w-4 h-4 text-emerald-700" />
+              البريد الإلكتروني
+            </label>
+            <input
+              className="w-full p-3 rounded-xl border border-slate-300 focus:border-emerald-600 text-sm"
+              placeholder="example@email.com"
+              value={restaurantEmail}
+              onChange={(e) => setRestaurantEmail(e.target.value)}
+            />
+          </div>
 
-        <input
-          className="w-full p-3 border rounded"
-          placeholder="رقم الهاتف"
-          value={restaurantPhone}
-          onChange={(e) => setRestaurantPhone(e.target.value)}
-        />
+          {/* Phone */}
+          <div className="space-y-1">
+            <label className="flex items-center gap-2 text-slate-700 font-semibold text-sm">
+              <Phone className="w-4 h-4 text-emerald-700" />
+              رقم الهاتف
+            </label>
+            <input
+              className="w-full p-3 rounded-xl border border-slate-300 focus:border-emerald-600 text-sm"
+              placeholder="0900000000"
+              value={restaurantPhone}
+              onChange={(e) => setRestaurantPhone(e.target.value)}
+            />
+          </div>
 
-        <input
-          className="w-full p-3 border rounded"
-          placeholder="العنوان"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
+          {/* Address */}
+          <div className="space-y-1">
+            <label className="flex items-center gap-2 text-slate-700 font-semibold text-sm">
+              <MapPin className="w-4 h-4 text-emerald-700" />
+              العنوان
+            </label>
+            <input
+              className="w-full p-3 rounded-xl border border-slate-300 focus:border-emerald-600 text-sm"
+              placeholder="المدينة - المنطقة - الشارع"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </div>
 
-        <textarea
-          className="w-full p-3 border rounded"
-          placeholder="وصف المطعم"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+          {/* Description */}
+          <div className="space-y-1">
+            <label className="flex items-center gap-2 text-slate-700 font-semibold text-sm">
+              <Building2 className="w-4 h-4 text-emerald-700" />
+              وصف المطعم
+            </label>
+            <textarea
+              className="w-full p-3 rounded-xl border border-slate-300 focus:border-emerald-600 text-sm"
+              placeholder="اكتب وصفاً مختصراً..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
 
-        <input
-          type="file"
-          onChange={(e) => setLicenseImage(e.target.files?.[0] || null)}
-        />
+          {/* Upload Box */}
+          <div className="space-y-1">
+            <label className="flex items-center gap-2 text-slate-700 font-semibold text-sm">
+              <FileImage className="w-4 h-4 text-emerald-700" />
+              صورة الترخيص
+            </label>
 
-        {error && <p className="text-red-500 font-semibold">{error}</p>}
-        {msg && <p className="text-green-600 font-semibold">{msg}</p>}
+            <label
+              htmlFor="license-image"
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition"
+            >
+              <FileImage className="w-8 h-8 text-slate-500 mb-2" />
+              <p className="text-xs text-slate-600">
+                <span className="font-semibold">اضغط للرفع</span> صورة الترخيص
+              </p>
+              <p className="text-[10px] text-slate-500">PNG, JPG, JPEG</p>
 
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg text-lg"
-        >
-          {loading ? "جاري الإرسال..." : "إرسال طلب الانضمام"}
-        </button>
+              <input
+                id="license-image"
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+            </label>
+
+            {preview && (
+              <img
+                src={preview}
+                alt="Preview"
+                className="mt-2 h-24 w-24 rounded-lg object-cover border shadow"
+              />
+            )}
+          </div>
+
+          {/* Submit */}
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-full text-sm"
+          >
+            {loading ? "جاري الإرسال..." : "إرسال طلب الانضمام"}
+          </button>
+
+          {error && <p className="text-red-500 font-semibold text-sm">{error}</p>}
+          {msg && <p className="text-green-600 font-semibold text-sm">{msg}</p>}
+
+          <p className="text-xs text-slate-500 text-center pt-1">
+            سيتم التواصل معك خلال 24 ساعة بعد مراجعة الطلب.
+          </p>
+        </div>
       </div>
     </div>
   );

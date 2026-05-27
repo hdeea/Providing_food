@@ -1,7 +1,6 @@
-// ✅ بعد:
-import { VoucherRequest } from '@/types/individual';
+import { FoodBondsRequest } from '@/types/individual';
 
-export const createFoodBond = async (voucher: VoucherRequest) => {
+export const createFoodBond = async (foodbond: FoodBondsRequest) => {
 
   try {
     const response = await fetch("/api/FoodBond", {
@@ -9,7 +8,7 @@ export const createFoodBond = async (voucher: VoucherRequest) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(voucher),
+      body: JSON.stringify(foodbond),
     });
 
     if (!response.ok) {
@@ -19,7 +18,7 @@ export const createFoodBond = async (voucher: VoucherRequest) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("❌ فشل إنشاء السند:", error);
+    console.error(" فشل إنشاء السند:", error);
     throw error;
   }
 };

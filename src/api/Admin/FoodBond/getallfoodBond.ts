@@ -1,6 +1,6 @@
-import { VoucherIssuance } from '@/types/individual';
+import { BondsIssuance } from '@/types/individual';
 
-export const fetchAllFoodVouchers = async (): Promise<VoucherIssuance[]> => {
+export const getAllFoodBonds = async (): Promise<BondsIssuance[]> => {
   try {
     const response = await fetch('/api/FoodBond');
 
@@ -8,7 +8,7 @@ export const fetchAllFoodVouchers = async (): Promise<VoucherIssuance[]> => {
       throw new Error(`فشل الجلب: ${response.status}`);
     }
 
-    const data: VoucherIssuance[] = await response.json();
+    const data: BondsIssuance[] = await response.json();
     return data;
   } catch (error) {
     console.error('فشل في جلب السندات:', error);

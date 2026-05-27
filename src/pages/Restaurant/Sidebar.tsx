@@ -64,13 +64,6 @@ export default function Sidebar({ user }: { user: any }) {
           collapsed={collapsed}
         />
 
-        <SidebarItem
-          to="/restaurant/stats"
-          icon={<BarChart3 size={20} />}
-          label="الإحصائيات"
-          active={location.pathname === "/restaurant/stats"}
-          collapsed={collapsed}
-        />
       </SidebarSection>
 
       {/* DONATIONS SECTION */}
@@ -113,10 +106,10 @@ export default function Sidebar({ user }: { user: any }) {
         />
 
         <SidebarItem
-          to="/restaurant/scan"
+          to="/restaurant/scan-bond"
           icon={<QrCode size={20} />}
           label="مسح QR"
-          active={location.pathname === "/restaurant/scan"}
+          active={location.pathname === "/restaurant/scan-bond"}
           collapsed={collapsed}
         />
       </SidebarSection>

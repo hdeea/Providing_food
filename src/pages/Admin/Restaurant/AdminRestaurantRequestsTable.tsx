@@ -58,44 +58,6 @@ export default function AdminRestaurantRequestsTable() {
   return (
     <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
 
-      {/* ⭐ Statistics Header */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-6 bg-slate-50 border-b">
-        <div className="rounded-xl p-4 bg-yellow-50 border border-yellow-200 text-center">
-          <p className="text-sm font-semibold text-yellow-700">Pending</p>
-          <p className="text-3xl font-black text-yellow-800">{pendingCount}</p>
-        </div>
-
-        <div className="rounded-xl p-4 bg-green-50 border border-green-200 text-center">
-          <p className="text-sm font-semibold text-green-700">Approved</p>
-          <p className="text-3xl font-black text-green-800">{approvedCount}</p>
-        </div>
-
-        <div className="rounded-xl p-4 bg-red-50 border border-red-200 text-center">
-          <p className="text-sm font-semibold text-red-700">Rejected</p>
-          <p className="text-3xl font-black text-red-800">{rejectedCount}</p>
-        </div>
-      </div>
-  {/* ⭐ Pending Requests Section (مطاعم فقط) */}
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg">
-        <div className="mb-6 pb-6 border-b border-slate-200">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100">
-                <UserPlus className="h-6 w-6 text-amber-700" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-black text-slate-900">
-                  Pending Restaurant Requests
-                  <span className="text-amber-600"> ({pendingCount})</span>
-                </h2>
-                <p className="text-sm text-slate-600 mt-1">
-                  All pending restaurant join requests
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
       
       {/*  Header + Filters */}
       <div className="border-b border-slate-200 px-6 py-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

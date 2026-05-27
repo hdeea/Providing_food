@@ -15,7 +15,23 @@ export const getAllBeneficiaryRequests = async () => {
       throw new Error(`Fetch failed: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+
+    const BASE_URL = "https://localhost:7060";
+
+    const fixed = data.map((r: any) => ({
+      ...r,
+      maritalStatusProofImage: r.maritalStatusProofImage
+        ? BASE_URL + r.maritalStatusProofImage
+        : null,
+
+      familySizeProofImage: r.familySizeProofImage
+        ? BASE_URL + r.familySizeProofImage
+        : null
+    }));
+
+    return fixed;
+
   } catch (error) {
     console.error("Error fetching beneficiary requests:", error);
     throw error;

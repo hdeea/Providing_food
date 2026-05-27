@@ -54,18 +54,57 @@ export default function Index() {
             </div>
           </div>
 
-          {/* NAV LINKS */}
-          <div className="hidden lg:flex flex-row-reverse items-center gap-4">
-            <Link to="/">
-              <span className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">Home</span>
-            </Link>
-            <a href="#services" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
-              Services
-            </a>
-            <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
-              How It Works
-            </a>
-          </div>
+         {/* NAV LINKS */}
+<div className="hidden lg:flex flex-row-reverse items-center gap-6">
+<button
+  onClick={() => {
+    // دائماً افتح تسجيل الدخول أولاً
+    window.location.href = "/donor/login?return=/donate-bond";
+  }}
+  className="
+    flex flex-row-reverse items-center gap-2
+    px-4 py-2
+    rounded-full
+    bg-emerald-500/10
+    text-emerald-700
+    hover:bg-emerald-600 hover:text-white
+    transition-all
+    border border-emerald-500/20
+    text-sm font-semibold
+  "
+>
+  <Gift size={16} />
+  <span>أهدي سنداً</span>
+</button>
+
+
+
+  {/* روابط الناف */}
+  <Link to="/" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
+    الرئيسية
+  </Link>
+
+  <a href="#services" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
+    بماذا نحن
+  </a>
+
+  <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
+    من نحن
+  </a>
+   <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
+    خدماتنا
+  </a>
+   <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
+    اتصل بنا
+  </a>
+   <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
+    How It Works
+  </a>
+   <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
+    How It Works
+  </a>
+</div>
+
 
           {/* LOGIN BUTTON LEFT */}
           <Link to="/login">
@@ -239,8 +278,7 @@ export default function Index() {
                 icon: HandHeart,
                 title: "Individual Donations",
                 desc: "Support families in need with ease and transparency.",
-                action: "/individual/donate"
-              },
+  action: "/donor/login?return=/individual/donate"              },
               {
                 icon: UserPlus,
                 title: "Request Help",
@@ -445,11 +483,11 @@ export default function Index() {
               <ul className="space-y-4 text-sm text-slate-400">
                 <li className="flex items-start gap-3">
                   <MapPin className="mt-1 h-4 w-4 text-emerald-300" />
-                  <span>Riyadh, Saudi Arabia</span>
+                  <span>Stria, Damascus</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Phone className="mt-1 h-4 w-4 text-emerald-300" />
-                  <span dir="ltr">+966 50 123 4567</span>
+                  <span dir="ltr">+963 912 345 678</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Mail className="mt-1 h-4 w-4 text-emerald-300" />

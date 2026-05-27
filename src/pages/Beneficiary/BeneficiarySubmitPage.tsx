@@ -18,57 +18,50 @@ const convertToBase64 = (file: File) => {
     reader.readAsDataURL(file);
   });
 };
-
 const handleSubmit = async () => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token"); // ✔ نفس AuthContext
 
   if (!token) {
     alert("يجب تسجيل الدخول أولاً");
     return;
   }
 
-  let maritalBase64 = "";
-  let familyBase64 = "";
-
-  if (maritalStatusProof) {
-    maritalBase64 = await convertToBase64(maritalStatusProof);
+  if (!maritalStatusProof || !familySizeProof) {
+    alert("يجب رفع الصور أولاً");
+    return;
   }
 
-  if (familySizeProof) {
-    familyBase64 = await convertToBase64(familySizeProof);
-  }
-
-  const body = {
-    fullName,
-    phoneNumber,
-    familySize,
-    maritalStatus,
-    maritalStatusProofImage: maritalBase64,
-    familySizeProofImage: familyBase64,
-      status: "Pending"   // ⭐ أهم سطر
-  };
+  const formData = new FormData();
+  formData.append("FullName", fullName);
+  formData.append("PhoneNumber", phoneNumber);
+  formData.append("FamilySize", String(familySize));
+  formData.append("MaritalStatus", maritalStatus);
+  formData.append("MaritalStatusProofImage", maritalStatusProof);
+  formData.append("FamilySizeProofImage", familySizeProof);
 
   try {
     const response = await fetch("/api/Beneficiary/submit", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
+        Authorization: `Bearer ${token}`, 
+        // ❌ لا تضيف Content-Type
       },
-      body: JSON.stringify(body)
+      body: formData, 
     });
 
     if (!response.ok) {
       const err = await response.text();
-      throw new Error(err);
+      console.error(err);
+      alert("فشل إرسال الطلب");
+      return;
     }
 
     alert("تم إرسال الطلب بنجاح");
   } catch (err) {
+    console.error(err);
     alert("حدث خطأ أثناء الإرسال");
   }
 };
-
 
 
   return (
@@ -76,7 +69,7 @@ const handleSubmit = async () => {
       <div className="max-w-lg mx-auto bg-white p-8 rounded-2xl shadow-lg border border-green-200">
 
         <h2 className="text-3xl font-bold text-center mb-6 text-green-700">
-          تسجيل مستفيد
+          تقديم طلب مساعدة
         </h2>
 
         <div className="space-y-6">

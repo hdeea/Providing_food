@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckCircle, XCircle, Clock, Users } from "lucide-react";
+import { CheckCircle, XCircle, Clock } from "lucide-react";
 import DashboardLayout from "@/components/Layout/DashboardLayout";
 import { getAllBeneficiaryRequests } from "@/api/Admin/Beneficiary/getAllBeneficiaryRequests";
 import { approveBeneficiaryRequest } from "@/api/Admin/Beneficiary/approveBeneficiaryRequest";
@@ -8,6 +8,8 @@ import { rejectBeneficiaryRequest } from "@/api/Admin/Beneficiary/rejectBenefici
 export default function BeneficiariesManagement() {
   const [beneficiaries, setBeneficiaries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
   const [statusFilter, setStatusFilter] = useState<
     "all" | "pending" | "approved" | "rejected"
   >("pending");
@@ -17,6 +19,8 @@ export default function BeneficiariesManagement() {
       try {
         const data = await getAllBeneficiaryRequests();
 
+        const BASE_URL = "https://localhost:7060";
+
         const mapped = data.map((item: any) => ({
           id: item.requestId,
           name: item.fullName,
@@ -25,6 +29,15 @@ export default function BeneficiariesManagement() {
           maritalStatus: item.maritalStatus,
           status: item.status.toLowerCase(),
           createdAt: item.createdDate,
+
+          // ⭐ الصور بعد التعديل
+          maritalStatusProofImage: item.maritalStatusProofImage
+            ? BASE_URL + item.maritalStatusProofImage
+            : null,
+
+          familySizeProofImage: item.familySizeProofImage
+            ? BASE_URL + item.familySizeProofImage
+            : null,
         }));
 
         setBeneficiaries(mapped);
@@ -144,23 +157,32 @@ export default function BeneficiariesManagement() {
             </div>
 
             <div className="space-y-2 text-slate-700">
-              <p>
-                <span className="font-semibold">الاسم:</span> {b.name}
-              </p>
-              <p>
-                <span className="font-semibold">الهاتف:</span> {b.phone}
-              </p>
-              <p>
-                <span className="font-semibold">أفراد العائلة:</span> {b.familySize}
-              </p>
-              <p>
-                <span className="font-semibold">الحالة الاجتماعية:</span>{" "}
-                {b.maritalStatus}
-              </p>
-              <p>
-                <span className="font-semibold">تاريخ الطلب:</span> {b.createdAt}
-              </p>
+              <p><span className="font-semibold">الاسم:</span> {b.name}</p>
+              <p><span className="font-semibold">الهاتف:</span> {b.phone}</p>
+              <p><span className="font-semibold">أفراد العائلة:</span> {b.familySize}</p>
+              <p><span className="font-semibold">الحالة الاجتماعية:</span> {b.maritalStatus}</p>
+              <p><span className="font-semibold">تاريخ الطلب:</span> {b.createdAt}</p>
             </div>
+
+            {/* ⭐ Images */}
+           <div className="mt-4 flex gap-3">
+  {b.maritalStatusProofImage && (
+    <img
+      src={b.maritalStatusProofImage}
+      onClick={() => setPreviewImage(b.maritalStatusProofImage)}
+      className="w-24 h-24 rounded-lg border object-cover cursor-pointer hover:opacity-80 transition"
+    />
+  )}
+
+  {b.familySizeProofImage && (
+    <img
+      src={b.familySizeProofImage}
+      onClick={() => setPreviewImage(b.familySizeProofImage)}
+      className="w-24 h-24 rounded-lg border object-cover cursor-pointer hover:opacity-80 transition"
+    />
+  )}
+</div>
+
 
             {/* ⭐ Actions */}
             {b.status === "pending" && (
@@ -182,6 +204,27 @@ export default function BeneficiariesManagement() {
           </div>
         ))}
       </div>
+      {previewImage && (
+  <div
+    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+    onClick={() => setPreviewImage(null)}
+  >
+    <div className="relative">
+      <img
+        src={previewImage}
+        className="max-w-[90vw] max-height-[90vh] rounded-xl shadow-2xl border-4 border-white"
+      />
+
+      <button
+        onClick={() => setPreviewImage(null)}
+        className="absolute top-2 right-2 bg-white text-black px-3 py-1 rounded-lg shadow"
+      >
+        إغلاق
+      </button>
+    </div>
+  </div>
+)}
+
     </DashboardLayout>
   );
 }

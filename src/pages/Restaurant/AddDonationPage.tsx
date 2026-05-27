@@ -40,7 +40,7 @@ export default function AddDonationPage() {
     try {
       const result = await postDonation(user.token, formData);
 
-      setMsg("تم إضافة التبرع بنجاح 🎉");
+      setMsg("تم إضافة التبرع بنجاح");
       setQuantity("");
       setDate("");
     } catch (err: any) {

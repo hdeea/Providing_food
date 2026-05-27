@@ -1,4 +1,4 @@
-import { DonationIndividualDto } from '@/types/individual';  // حسب مكان الملف تبعك
+import { DonationIndividualDto } from '@/types/individual';  
 
 export const postDonationIndividual = async (donation: DonationIndividualDto) => {
   const payload = {

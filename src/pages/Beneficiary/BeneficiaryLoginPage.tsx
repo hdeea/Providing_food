@@ -23,7 +23,10 @@ const handleLogin = async () => {
       setError("هذا الحساب ليس حساب مستفيد");
       return;
     }
-
+ localStorage.setItem("token", result.token);
+    localStorage.setItem("role", result.role);
+    localStorage.setItem("fullName", result.fullName);
+    
     setTimeout(() => navigate("/beneficiary/dashboard"), 100);
   } catch (err: any) {
     setError(err.message || "حدث خطأ أثناء تسجيل الدخول");

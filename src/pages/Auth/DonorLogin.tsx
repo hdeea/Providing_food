@@ -16,6 +16,10 @@ export default function DonorLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  // ⭐ التقاط return URL
+const returnUrl =
+  new URLSearchParams(window.location.search).get("return") || "/";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -25,7 +29,7 @@ export default function DonorLogin() {
 
       if (isRegister) {
         // ⭐ تسجيل حساب متبرّع جديد
-result = await register(fullName, email, password, phoneNumber, "donor");
+        result = await register(fullName, email, password, phoneNumber, "donor");
       } else {
         // ⭐ تسجيل دخول المتبرّع
         result = await login(email, password);
@@ -42,8 +46,8 @@ result = await register(fullName, email, password, phoneNumber, "donor");
         return;
       }
 
-      // ⭐ بعد تسجيل الدخول → روح لصفحة التبرع
-      setTimeout(() => navigate("/donor/donate"), 100);
+      // ⭐ بعد تسجيل الدخول → رجوع للصفحة الأصلية
+      setTimeout(() => navigate(returnUrl), 100);
 
     } catch (err: any) {
       setError(err.message || "حدث خطأ أثناء العملية");

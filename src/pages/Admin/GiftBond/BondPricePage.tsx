@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 export default function BondPricePage() {
   const [price, setPrice] = useState<number | null>(null);
   const [newPrice, setNewPrice] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const loadPrice = async () => {
     try {
@@ -21,13 +20,9 @@ export default function BondPricePage() {
   }, []);
 
   const handleUpdate = async () => {
-    if (!newPrice) return;
-
-    setLoading(true);
     await setBondPrice(Number(newPrice));
     setNewPrice("");
     await loadPrice();
-    setLoading(false);
   };
 
   return (
@@ -48,17 +43,10 @@ export default function BondPricePage() {
         />
 
         <Button
-          id="updatePriceBtn"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white w-full"
           onClick={handleUpdate}
-          disabled={loading}
-          className="
-            w-full py-2 rounded-lg text-white
-            bg-[#166534] hover:bg-[#15803D]
-            dark:bg-[#065F46] dark:hover:bg-[#0d8a63]
-            transition
-          "
         >
-          {loading ? "جاري التحديث..." : "تحديث السعر"}
+          تحديث السعر
         </Button>
       </div>
     </div>

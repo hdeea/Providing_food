@@ -1,7 +1,9 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function BeneficiaryDashboard() {
-  const userName = "مستفيد"; // لاحقاً منجيب الاسم من الـ API أو الـ Auth
+ const { user } = useAuth();
+const userName = user?.fullName || "مستفيد";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 py-10 px-4">
@@ -33,23 +35,6 @@ export default function BeneficiaryDashboard() {
 حالة طلبــي
           </Link>
 
-        </div>
-
-        {/* معلومات بسيطة */}
-        <div className="mt-10 bg-green-50 border border-green-200 p-5 rounded-xl">
-          <h3 className="text-green-700 font-semibold mb-2">معلومات الحساب</h3>
-
-          <p className="text-gray-700">
-            <span className="font-semibold">الاسم:</span> {userName}
-          </p>
-
-          <p className="text-gray-700 mt-1">
-            <span className="font-semibold">نوع الحساب:</span> مستفيد
-          </p>
-
-          <p className="text-gray-700 mt-1">
-            <span className="font-semibold">آخر تسجيل دخول:</span> الآن
-          </p>
         </div>
 
       </div>
