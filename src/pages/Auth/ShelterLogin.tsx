@@ -28,7 +28,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     }
 
     if (!result) {
-      setError("❌ فشل العملية، تأكد من بياناتك");
+      setError(" فشل العملية، تأكد من بياناتك");
       return;
     }
 
@@ -37,7 +37,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       return;
     }
 
-    // ⭐ بعد التسجيل أو تسجيل الدخول، روح إلى صفحة الملجأ الرئيسية لتحديد الحالة
+    //  بعد التسجيل أو تسجيل الدخول، روح إلى صفحة الملجأ الرئيسية لتحديد الحالة
 setTimeout(() => navigate("/shelter/dashboard"), 100);
   } catch (err: any) {
     setError(err.message || "حدث خطأ أثناء العملية");

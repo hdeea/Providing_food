@@ -8,7 +8,12 @@ export const createFoodBond = async (foodbond: FoodBondsRequest) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(foodbond),
+body: JSON.stringify({
+  beneficiaryName: foodbond.beneficiaryName,
+  restaurantName: foodbond.restaurantName,
+  numberOfMeals: foodbond.numberOfMeals,
+  expiryDate: foodbond.expiryDate
+})
     });
 
     if (!response.ok) {

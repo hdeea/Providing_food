@@ -1,107 +1,128 @@
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { getChallengeStatus, getDonorPoints } from "@/api/ramadanChallenge";
 
 export default function RamadanChallengeHome() {
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [status, setStatus] = useState<any>(null);
   const [points, setPoints] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // تحميل البيانات
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    const load = async () => {
+    const loadData = async () => {
       try {
-        const s = await fetch("/api/challenge/status", {
-          headers: { Authorization: `Bearer ${user.token}` },
-        }).then((r) => r.json());
+        const [statusData, pointsData] = await Promise.all([
+          getChallengeStatus(),
+          getDonorPoints(),
+        ]);
 
-        const p = await fetch("/api/challenge/my-points", {
-          headers: { Authorization: `Bearer ${user.token}` },
-        }).then((r) => r.json());
-
-        setStatus(s);
-        setPoints(p);
+        setStatus(statusData);
+        setPoints(pointsData);
+      } catch (err: any) {
+        setError(err?.message || "فشل في تحميل بيانات التحدي.");
       } finally {
         setLoading(false);
       }
     };
 
-    load();
+    loadData();
   }, [user]);
 
-  // بدء التحدي
-  const startChallenge = async () => {
-    await fetch("/api/bond/create-session", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${user.token}` },
-    });
+  const isLoggedOut = !user;
 
-    window.location.reload();
-  };
-
-  if (loading) return <p className="p-6">جاري التحميل...</p>;
+  if (loading)
+    return <p className="p-6 text-center">جاري التحميل، يرجى الانتظار...</p>;
 
   return (
-    <div className="min-h-screen bg-emerald-700 flex items-center justify-center">
-      <div className="bg-white p-10 rounded-3xl shadow-xl w-full max-w-md space-y-6">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-beige-50 to-white flex items-center justify-center p-8">
+      <div className="max-w-4xl w-full">
+        <div className="bg-white rounded-2xl border border-amber-200 shadow-xl p-8 md:p-12 relative overflow-hidden" dir="rtl">
+          <div className="relative z-10">
+            <h1 className="text-4xl md:text-5xl text-center mb-6 text-green-800">
+              تحدي 10 أيام خير في رمضان
+            </h1>
+            <p className="text-lg text-gray-700 text-center leading-relaxed mb-4">
+              شارك في تحدي التبرع اليومي، أكمل 10 أيام متتالية وحصل على نقاط ومكافآت عند الإتمام.
+            </p>
+            <p className="text-base text-gray-600 text-center leading-relaxed mb-8">
+              كل يوم تبرع فيه يُسجل يومًا مكتملًا. إذا فُقد يوم، يتم إعادة العد إلى الصفر.
+            </p>
 
-        <h1 className="text-3xl font-black text-emerald-700 text-center">
-          تحدّي 10 أيام خير رمضان
-        </h1>
+            {error && (
+              <div className="rounded-3xl bg-red-50 border border-red-200 p-4 text-red-700 mb-6">
+                {error}
+              </div>
+            )}
 
-        {/* حالة التحدي */}
-        <div className="bg-emerald-50 p-6 rounded-2xl text-center">
-          <p className="text-lg font-bold text-emerald-700">
-            {status?.challengeStatus}
-          </p>
-          <p className="text-sm text-emerald-600">
-            الأيام المتبقية: {status?.remainingDays}
-          </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-100">
+                <p className="text-sm text-green-700">الأيام المكتملة</p>
+                <p className="text-3xl font-black text-green-900">{status?.completedDays ?? 0}</p>
+              </div>
+              <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-100">
+                <p className="text-sm text-amber-700">النقاط الحالية</p>
+                <p className="text-3xl font-black text-amber-900">{points?.points ?? 0}</p>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-100">
+                <p className="text-sm text-purple-700">حالة الفوز</p>
+                <p className="text-3xl font-black text-purple-900">
+                  {status?.isWinner ? "فائز" : "قيد المتابعة"}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <button
+                onClick={() => {
+                  if (isLoggedOut) {
+                    navigate("/donor/login?return=/donor/donation-type");
+                    return;
+                  }
+                  navigate("/donor/donation-type");
+                }}
+                className="w-full py-4 rounded-xl bg-green-600 text-white font-bold hover:bg-green-700"
+              >
+                ابدأ التبرع اليومي
+              </button>
+              <button
+                onClick={() => navigate("/donor/status")}
+                className="w-full py-4 rounded-xl bg-slate-200 text-slate-700 font-bold hover:bg-slate-300"
+              >
+                عرض حالة التحدي
+              </button>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+              <Link to="/donor/points" className="block">
+                <div className="rounded-3xl bg-slate-100 p-5 text-center hover:bg-slate-200 transition">
+                  <p className="text-sm text-slate-500">نقاطي</p>
+                  <p className="mt-2 text-xl font-bold text-slate-900">{points?.points ?? 0}</p>
+                </div>
+              </Link>
+              <Link to="/donor/winners" className="block">
+                <div className="rounded-3xl bg-yellow-50 p-5 text-center hover:bg-yellow-100 transition">
+                  <p className="text-sm text-yellow-700">قائمة الفائزين</p>
+                  <p className="mt-2 text-xl font-bold text-yellow-900">عرض</p>
+                </div>
+              </Link>
+              <Link to="/donor/donate-cash-challenge" className="block">
+                <div className="rounded-3xl bg-emerald-50 p-5 text-center hover:bg-emerald-100 transition">
+                  <p className="text-sm text-emerald-700">تبرع مالي</p>
+                  <p className="mt-2 text-xl font-bold text-emerald-900">ابدأ الآن</p>
+                </div>
+              </Link>
+            </div>
+          </div>
         </div>
-
-        {/* نقاطي */}
-        <div className="bg-emerald-50 p-6 rounded-2xl text-center">
-          <p className="text-3xl font-black text-emerald-700">
-            {points?.myPoints} / 10
-          </p>
-          <p className="text-sm text-emerald-600">نقاطك في التحدي</p>
-        </div>
-
-        {/* زر بدء التحدي */}
-        {!status?.isActive && (
-          <button
-            onClick={startChallenge}
-            className="w-full py-3 rounded-xl bg-emerald-700 text-white font-bold hover:bg-emerald-800"
-          >
-            ابدأ التحدي الآن
-          </button>
-        )}
-
-        {/* روابط */}
-        <div className="space-y-3">
-          <Link to="/donor/points">
-            <button className="w-full py-3 rounded-xl bg-white border border-emerald-700 text-emerald-700 font-bold hover:bg-emerald-50">
-              نقاطي
-            </button>
-          </Link>
-
-          <Link to={`/donor/winners/${status?.challengeId}`}>
-            <button className="w-full py-3 rounded-xl bg-yellow-500 text-white font-bold hover:bg-yellow-600">
-              ⭐ عرض المتصدرين
-            </button>
-          </Link>
-
-          <Link to="/donor/status">
-            <button className="w-full py-3 rounded-xl bg-slate-200 text-slate-700 font-bold hover:bg-slate-300">
-              حالة التحدي
-            </button>
-          </Link>
-        </div>
-
       </div>
     </div>
   );

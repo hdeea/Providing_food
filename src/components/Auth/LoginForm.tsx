@@ -18,8 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Heart, LogIn } from 'lucide-react';
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email('صيغة البريد الإلكتروني غير صحيحة'),
+  password: z.string().min(1, 'كلمة المرور مطلوبة'),
 });
 
 type FormData = z.infer<typeof loginSchema>;
@@ -38,62 +38,62 @@ const LoginForm: React.FC = () => {
     },
   });
 
- const onSubmit = async (data: FormData) => {
-  try {
-    setIsLoading(true);
-    const loggedInUser = await login(data.email, data.password);
+  const onSubmit = async (data: FormData) => {
+    try {
+      setIsLoading(true);
+      const loggedInUser = await login(data.email, data.password);
 
-    if (loggedInUser) {
-      if (loggedInUser.role === "admin") {
-        navigate("/admin");
-      } else if (loggedInUser.role === "restaurant") {
-        navigate("/restaurant");
+      if (loggedInUser) {
+        if (loggedInUser.role === "admin") {
+          navigate("/admin");
+        } else if (loggedInUser.role === "restaurant") {
+          navigate("/restaurant");
+        } else {
+          toast({
+            title: "وصول غير مصرح",
+            description: "حسابك لا يملك صلاحيات الدخول إلى لوحة التحكم",
+            variant: "destructive",
+          });
+        }
       } else {
         toast({
-          title: "Unauthorized Access",
-          description: "Your account doesn't have admin privileges",
+          title: "فشل تسجيل الدخول",
+          description: "تحقق من البيانات وحاول مرة أخرى",
           variant: "destructive",
         });
       }
-    } else {
+    } catch (error: any) {
       toast({
-        title: "Login Failed",
-        description: "Please check your credentials and try again",
+        title: "فشل تسجيل الدخول",
+        description: error?.message || "الخادم غير متاح حاليًا. حاول لاحقًا.",
         variant: "destructive",
       });
+      console.error("Login form error:", error);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error: any) {
-    toast({
-      title: "Login Failed",
-      description: error?.message || "Server is unavailable. Please try again later.",
-      variant: "destructive",
-    });
-    console.error("Login form error:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-md" dir="rtl">
       <div className="rounded-[2rem] border border-white/20 bg-white/10 p-10 shadow-2xl shadow-black/20 backdrop-blur-xl">
         <div className="text-center mb-8">
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-white/20 mb-4 border border-white/30">
             <Heart className="h-8 w-8 text-white fill-white" />
           </div>
           <h1 className="text-3xl font-black text-white">Providing Food</h1>
-          <p className="text-white/90 mt-2">Assembly control panel Admin</p>
+          <p className="text-white/90 mt-2">لوحة تحكم الجمعية</p>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white/90 font-semibold">Email </FormLabel>
+                  <FormLabel className="text-white/90 font-semibold">البريد الإلكتروني</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="admin@example.com"
@@ -112,7 +112,7 @@ const LoginForm: React.FC = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white/90 font-semibold">Password</FormLabel>
+                  <FormLabel className="text-white/90 font-semibold">كلمة المرور</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -135,24 +135,24 @@ const LoginForm: React.FC = () => {
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-900 border-t-transparent"></span>
-                  Signing in...
+                  جاري تسجيل الدخول...
                 </span>
               ) : (
                 <span className="flex items-center gap-2 justify-center">
                   <LogIn className="h-5 w-5" />
-                  Sign In
+                  تسجيل الدخول
                 </span>
               )}
             </Button>
 
-   
           </form>
         </Form>
       </div>
 
       <div className="mt-8 text-center">
         <p className="text-white/60 text-sm">
-          For security purposes, only authorized administrators can access this portal
+         
+         لأسباب أمنية، يمكن للمسؤولين المخوّلين فقط الوصول إلى هذه اللوحة
         </p>
       </div>
     </div>

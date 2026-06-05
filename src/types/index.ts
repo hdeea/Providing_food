@@ -18,7 +18,34 @@ export interface User {
   email?: string;
 }
 
+export interface ChallengeStatus {
+  currentDay: number;
+  completedDays: number;
+  points: number;
+  lastDonationDate: string | null;
+  isWinner: boolean;
+  remainingDays: number;
+  progress: number;
+  challengeName?: string;
+  nextDonationDeadline?: string | null;
+}
 
+export interface ChallengeWinner {
+  donorId: number;
+  fullName: string;
+  completedDays: number;
+  points: number;
+  isWinner: boolean;
+  lastDonationDate: string | null;
+}
+
+export interface DonorPoints {
+  points: number;
+  completedDays: number;
+  currentDay: number;
+  lastDonationDate: string | null;
+  isWinner: boolean;
+}
 
 
 export type Restaurant = {

@@ -81,13 +81,7 @@ export default function Sidebar({ user }: { user: any }) {
           collapsed={collapsed}
         />
 
-        <SidebarItem
-          to="/restaurant/donations"
-          icon={<List size={20} />}
-          label="تبرعاتي"
-          active={location.pathname === "/restaurant/donations"}
-          collapsed={collapsed}
-        />
+        
       </SidebarSection>
 
       {/* SHELTERS SECTION */}

@@ -55,7 +55,7 @@ export default function FoodBondsPage() {
         numberOfMeals: Number(form.numberOfMeals),
         expiryDate: form.expiryDate,
       };
-
+    console.log("Payload being sent:", payload);
       await createFoodBond(payload);
 
       setMessage("تم إنشاء السند بنجاح");
@@ -69,7 +69,7 @@ export default function FoodBondsPage() {
         expiryDate: "",
       });
     } catch (err) {
-      setMessage("❌ فشل إنشاء السند");
+      setMessage(" فشل إنشاء السند");
     }
 
     setCreating(false);

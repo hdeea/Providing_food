@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Ticket } from "lucide-react";
 
@@ -49,9 +42,15 @@ export function VouchersAdmin() {
     expiryDate: ""
   });
 
+  // عرض QR
   const showQR = async (code: string) => {
     try {
       const blob = await getVoucherQR(token, code);
+
+      if (!blob || blob.size === 0) {
+        throw new Error("QR فارغ أو غير صالح");
+      }
+
       const url = URL.createObjectURL(blob);
       setQrImage(url);
     } catch (err) {
@@ -59,8 +58,10 @@ export function VouchersAdmin() {
     }
   };
 
-  // Load ALL vouchers
+  // تحميل كل القسائم
   useEffect(() => {
+    if (!token) return;
+
     const load = async () => {
       try {
         const res = await fetch("/api/voucher/all", {
@@ -68,6 +69,8 @@ export function VouchersAdmin() {
             Authorization: `Bearer ${token}`
           }
         });
+
+        if (!res.ok) return;
 
         const data = await res.json();
         setVouchers(data);
@@ -81,39 +84,31 @@ export function VouchersAdmin() {
     load();
   }, [token]);
 
-  // Helper function to check if expiry date has passed
+  // حساب انتهاء الصلاحية
   const isExpired = (expiryDate: string): boolean => {
     try {
       const expiry = new Date(expiryDate);
-      const now = new Date();
-      return expiry < now;
+      expiry.setHours(23, 59, 59);
+      return new Date() > expiry;
     } catch {
       return false;
     }
   };
 
-  // Determine actual status based on status and expiryDate
-  const getActualStatus = (voucher: Voucher): 'pending' | 'used' | 'expired' => {
-    const statusLower = (voucher.status || '').toLowerCase();
-    
-    // If status is already "used", show as used
-    if (statusLower === 'used') {
-      return 'used';
-    }
-    
-    // If expiry date has passed, show as expired
-    if (isExpired(voucher.expiryDate)) {
-      return 'expired';
-    }
-    
-    // Otherwise show as pending
-    return 'pending';
+  // تحديد الحالة الفعلية
+  const getActualStatus = (voucher: Voucher): "pending" | "used" | "expired" => {
+    const statusLower = (voucher.status || "").toLowerCase();
+
+    if (statusLower === "used") return "used";
+    if (isExpired(voucher.expiryDate)) return "expired";
+
+    return "pending";
   };
 
-  // Calculate statistics
-  const pendingCount = vouchers.filter(v => getActualStatus(v) === 'pending').length;
-  const usedCount = vouchers.filter(v => getActualStatus(v) === 'used').length;
-  const expiredCount = vouchers.filter(v => getActualStatus(v) === 'expired').length;
+  // الإحصائيات
+  const pendingCount = vouchers.filter(v => getActualStatus(v) === "pending").length;
+  const usedCount = vouchers.filter(v => getActualStatus(v) === "used").length;
+  const expiredCount = vouchers.filter(v => getActualStatus(v) === "expired").length;
 
   // إنشاء قسيمة جديدة
   const handleGenerate = async () => {
@@ -124,14 +119,13 @@ export function VouchersAdmin() {
         storeName: formData.storeName,
         storeLocation: formData.storeLocation,
         basketCount: Number(formData.basketCount),
-        expiryDate: formData.expiryDate + "T00:00:00"
+        expiryDate: formData.expiryDate + "T23:59:59"
       };
 
       const newVoucher = await generateVoucher(token, body);
-console.log("NEW VOUCHER RESPONSE:", newVoucher);
+
       setVouchers(prev => [newVoucher, ...prev]);
 
-      // إغلاق الفورم
       setShowForm(false);
       setFormData({
         beneficiaryId: "",
@@ -147,20 +141,6 @@ console.log("NEW VOUCHER RESPONSE:", newVoucher);
     }
   };
 
-  // تحديث حالة القسيمة
-  const markAsReceived = async (code: string) => {
-    try {
-      await acknowledgeVoucher(code, token);
-      setVouchers(prev =>
-        prev.map(v =>
-          v.qrCode === code ? { ...v, status: "Used" } : v
-        )
-      );
-    } catch (err) {
-      console.error("Error acknowledging voucher:", err);
-    }
-  };
-
   return (
     <div dir="rtl">
       <div className="flex items-center gap-3 mb-6">
@@ -170,7 +150,7 @@ console.log("NEW VOUCHER RESPONSE:", newVoucher);
 
       <div className="bg-white rounded-xl border border-green-100 p-6 shadow-sm">
 
-        {/* Statistics Cards */}
+        {/* الإحصائيات */}
         <div className="grid grid-cols-4 gap-3 mb-6">
           <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4">
             <p className="text-xs text-yellow-600 font-semibold uppercase">قيد الانتظار</p>
@@ -291,11 +271,16 @@ console.log("NEW VOUCHER RESPONSE:", newVoucher);
                   const actualStatus = getActualStatus(v);
 
                   return (
-                    <TableRow key={v.voucherId}>
-                      <TableCell className="text-right">{v.qrCode}</TableCell>
+                    <TableRow key={v.voucherId} className="hover:bg-gray-50">
+
+                      <TableCell className="text-right font-mono text-sm">{v.qrCode}</TableCell>
+
                       <TableCell className="text-right">{v.beneficiaryName}</TableCell>
+
                       <TableCell className="text-right">{v.storeName}</TableCell>
+
                       <TableCell className="text-right">{v.basketCount}</TableCell>
+
                       <TableCell className="text-right">
                         {new Date(v.createdAt).toLocaleDateString("ar-EG")}
                       </TableCell>
@@ -320,9 +305,8 @@ console.log("NEW VOUCHER RESPONSE:", newVoucher);
 
                       <TableCell className="text-right">
                         <Button
-                          size="sm"
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
                           onClick={() => showQR(v.qrCode)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
                         >
                           عرض QR
                         </Button>
@@ -336,19 +320,26 @@ console.log("NEW VOUCHER RESPONSE:", newVoucher);
             </Table>
           </div>
         )}
+
       </div>
 
-      {/* QR Popup */}
+      {/* ⭐⭐⭐ المودال الصحيح — خارج الجدول ⭐⭐⭐ */}
       {qrImage && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-xl shadow-lg text-center">
-            <img src={qrImage} alt="QR Code" className="w-64 h-64 mx-auto" />
-            <Button
-              className="mt-4 bg-red-600 hover:bg-red-700 text-white"
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-3xl shadow-xl text-center space-y-4">
+
+            <img
+              src={qrImage}
+              alt="QR Code"
+              className="w-64 h-64 mx-auto rounded-xl border shadow"
+            />
+
+            <button
               onClick={() => setQrImage(null)}
+              className="w-full py-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition"
             >
               إغلاق
-            </Button>
+            </button>
           </div>
         </div>
       )}

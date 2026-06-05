@@ -32,7 +32,7 @@ export default function RestaurantLogin() {
       }
 
       if (!result) {
-        setError("❌ فشل العملية، تأكد من بياناتك");
+        setError(" فشل العملية، تأكد من بياناتك");
         return;
       }
 

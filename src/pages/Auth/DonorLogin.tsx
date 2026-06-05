@@ -16,7 +16,6 @@ export default function DonorLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // ⭐ التقاط return URL
 const returnUrl =
   new URLSearchParams(window.location.search).get("return") || "/";
 
@@ -28,10 +27,8 @@ const returnUrl =
       let result;
 
       if (isRegister) {
-        // ⭐ تسجيل حساب متبرّع جديد
         result = await register(fullName, email, password, phoneNumber, "donor");
       } else {
-        // ⭐ تسجيل دخول المتبرّع
         result = await login(email, password);
       }
 
@@ -47,8 +44,7 @@ const returnUrl =
       }
 
       // ⭐ بعد تسجيل الدخول → رجوع للصفحة الأصلية
-      setTimeout(() => navigate(returnUrl), 100);
-
+      navigate(returnUrl || "/donor/ramadan", { replace: true });
     } catch (err: any) {
       setError(err.message || "حدث خطأ أثناء العملية");
     }

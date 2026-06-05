@@ -2,9 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { ComponentType, ReactNode } from "react";
+import { ReactNode } from "react";
 
 // Main Pages
 import Index from "./pages/Index";
@@ -24,9 +24,9 @@ import { approveBeneficiaryRequest } from "@/api/Admin/Beneficiary/approveBenefi
 import { rejectBeneficiaryRequest } from "@/api/Admin/Beneficiary/rejectBeneficiaryRequest";
 import AdminPendingRequestsPage from "@/pages/Admin/AdminPendingRequestsPage";
 import SeasonItemsPage from "@/pages/Admin/Season/SeasonItemsPage";
-import BondPricePage from "@/pages/Admin/GiftBond/BondPricePage";
-import CreateGiftBondPage from "@/pages/Admin/GiftBond/CreateGiftBondPage";
-import AllGiftDonationsPage from "@/pages/Admin/GiftBond/AllGiftDonationsPage";
+import BondPricePage from "@/pages/Admin/Donationstype/BondPricePage";
+import CreateGiftBondPage from "@/pages/Admin/Donationstype/CreateGiftBondPage";
+import AllGiftDonationsPage from "@/pages/Admin/Donationstype/AllGiftDonationsPage";
 import FoodBondsPage from "@/pages/Admin/FoodBond/FoodBondsPage";
 
 
@@ -34,7 +34,6 @@ import FoodBondsPage from "@/pages/Admin/FoodBond/FoodBondsPage";
 import DashboardPage from "./pages/Restaurant/RestaurantDashboard";
 import RestaurantLogin from "./pages/Auth/RestaurantLogin";
 import RestaurantRequestsPage from "./pages/Admin/Restaurant/AdminRestaurantRequestsTable";
-import MyDonationsPage from "./pages/Restaurant/MyDonationsPage";
 import AddDonationPage from "./pages/Restaurant/AddDonationPage";
 
 import FoodBondScanAndConfirm from "@/components/Scanner/FoodBondScanAndConfirm";
@@ -57,13 +56,16 @@ import TrackRequestPage from "./pages/Beneficiary/TrackRequestPage";
 
 // Donor Pages
 import DonorDonateOptions from "./pages/Donor/DonorDashboard";
-import DonateCash from "./pages/Donor/DonateCash";
+import DonateCashChallenge from "./pages/Donor/DonateCashChallenge";
 import DonateMeals from "./pages/Donor/DonateMeals";
 import DonateGift from "./pages/Donor/DonateGift";
 import DonorPoints from "./pages/Donor/DonorPoints";
 import Winners from "./pages/Donor/Winners";
 import ChallengeStatus from "@/pages/Donor/ChallengeStatus";
 import DonateBondPage from "@/pages/Donor/DonateBondPage";
+import EventLanding from "./pages/Donor/days10Ramadan";
+import DonationTypePage from "./pages/Donor/DonationTypePage";
+
 
 // Layouts
 import DashboardLayout from "./components/Layout/DashboardLayout";
@@ -87,9 +89,17 @@ import RestaurantLayout from "./pages/Restaurant/RestaurantLayout";
 import RamadanChallengeHome from "./pages/Donor/RamadanChallengeHome";
 
 import SeasonManagementPage from "./pages/Admin/Season/SeasonManagement";
-import {getallfoodBond} from "@/api/Admin/FoodBond/getallfoodBond";
+import {getAllFoodBonds} from "@/api/Admin/FoodBond/getallfoodBond";
 import FoodBondDetailsPage from "@/pages/Admin/FoodBond/FoodBondDetailsPage";
+import MoneyDonationsPage from "./pages/Admin/Donationstype/MoneyDonationsPage";
+import VoucherScanAndRedeem from "./components/Scanner/VoucherScanAndRedeem";
+import BeneficiaryBondsPage from "./pages/Beneficiary/BeneficiaryBondsPage";
+import DonateCashPage from "./pages/Donor/DonateCashPage";
+import RestaurantDonationsAdmin from "./pages/Admin/Restaurant/RestaurantDonationsAdmin";
+
+
 // Protected Route
+
 const ProtectedRoute = ({
   children,
   allowedRoles = [],
@@ -98,6 +108,7 @@ const ProtectedRoute = ({
   allowedRoles?: string[];
 }) => {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -107,24 +118,42 @@ const ProtectedRoute = ({
     );
   }
 
-  if (!user) {
-    const fallbackLogin = allowedRoles.includes("admin")
-      ? "/login"
-      : allowedRoles.includes("restaurant")
-      ? "/restaurant/login"
-      : allowedRoles.includes("beneficiary")
-      ? "/beneficiary/login"
-      : allowedRoles.some((role) => role.includes("shelter"))
-      ? "/shelter/login"
-      : allowedRoles.some((role) => role.includes("store"))
-      ? "/store/login"
-      : "/login";
+  const buildLoginRedirect = () => {
+    const returnUrl = encodeURIComponent(location.pathname + location.search);
 
-    return <Navigate to={fallbackLogin} replace />;
+    if (allowedRoles.includes("donor")) {
+      return `/donor/login?return=${returnUrl}`;
+    }
+
+    if (allowedRoles.includes("admin")) {
+      return "/login";
+    }
+
+    if (allowedRoles.includes("restaurant")) {
+      return "/restaurant/login";
+    }
+
+    if (allowedRoles.includes("beneficiary")) {
+      return "/beneficiary/login";
+    }
+
+    if (allowedRoles.some((role) => role.includes("shelter"))) {
+      return "/shelter/login";
+    }
+
+    if (allowedRoles.some((role) => role.includes("store"))) {
+      return "/store/login";
+    }
+
+    return "/login";
+  };
+
+  if (!user) {
+    return <Navigate to={buildLoginRedirect()} replace />;
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to="/donor/login" replace />;
   }
 
   return <>{children}</>;
@@ -151,6 +180,10 @@ const BeneficiaryRoute = ({ children }: { children: ReactNode }) => (
   <ProtectedRoute allowedRoles={["beneficiary"]}>{children}</ProtectedRoute>
 );
 
+const DonorRoute = ({ children }: { children: ReactNode }) => (
+  <ProtectedRoute allowedRoles={["donor"]}>{children}</ProtectedRoute>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -162,8 +195,47 @@ const App = () => (
 
 <Route path="/donor/login" element={<DonorLogin />} />
 
-<Route path="/donor/status" element={<ChallengeStatus />} />
-<Route path="/donor/winners/:id" element={<Winners />} />
+            {/* Donor Challenge Routes */}
+            <Route
+              path="/donor/status"
+              element={
+                <DonorRoute>
+                  <ChallengeStatus />
+                </DonorRoute>
+              }
+            />
+            <Route
+              path="/donor/points"
+              element={
+                <DonorRoute>
+                  <DonorPoints />
+                </DonorRoute>
+              }
+            />
+            <Route
+              path="/donor/winners"
+              element={
+                <DonorRoute>
+                  <Winners />
+                </DonorRoute>
+              }
+            />
+            <Route
+              path="/donor/donate-cash-challenge"
+              element={
+                <DonorRoute>
+                  <DonateCashChallenge />
+                </DonorRoute>
+              }
+            />
+            <Route
+              path="/donor/donation-type"
+              element={
+                <DonorRoute>
+                  <DonationTypePage />
+                </DonorRoute>
+              }
+            />
 
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
@@ -173,18 +245,16 @@ const App = () => (
             {/* Donor (Individual) */}
             <Route path="/individual/donate" element={<DonorRegistrationPage />} />
             <Route path="/individual/track-donations" element={<TrackDonationsPage />} />
-<Route path="/donor/ramadan" element={<RamadanChallengeHome />} />
-<Route path="/admin/gift-bond/price" element={<BondPricePage />} />
-<Route path="/donor/gift-bond/create" element={<CreateGiftBondPage />} />
-<Route path="/admin/gift-bond/donations" element={<AllGiftDonationsPage />} />
-<Route path="/donate-bond" element={<DonateBondPage />} />
+            <Route path="/admin/gift-bond/price" element={<BondPricePage />} />
+            <Route path="/donor/gift-bond/create" element={<CreateGiftBondPage />} />
+            <Route path="/admin/gift-bond/donations" element={<AllGiftDonationsPage />} />
+            <Route path="/donate-bond" element={<DonateBondPage />} />
 
-<Route path="/donor/donate" element={<DonorDonateOptions />} />
-<Route path="/donor/donate/cash" element={<DonateCash />} />
-<Route path="/donor/donate/meals" element={<DonateMeals />} />
-<Route path="/donor/donate/gift" element={<DonateGift />} />
-<Route path="/donor/points" element={<DonorPoints />} />
-<Route path="/donor/winners" element={<Winners />} />
+            <Route path="/donor/donate" element={<DonorDonateOptions />} />
+            <Route path="/donor/donate/meals" element={<DonateMeals />} />
+            <Route path="/donor/donate/gift" element={<DonateGift />} />
+            <Route path="/donor/ramadan" element={<EventLanding />} />
+<Route path="/donor/donate-cash" element={<DonateCashPage />} />
 
             {/* Beneficiary Routes */}
     <Route path="/beneficiary/register" element={<BeneficiaryRegisterPage />} />
@@ -192,6 +262,11 @@ const App = () => (
 <Route path="/beneficiary/dashboard" element={<BeneficiaryRoute><BeneficiaryDashboard /></BeneficiaryRoute>} />
 <Route path="/beneficiary/submit" element={<BeneficiaryRoute><BeneficiarySubmitPage /></BeneficiaryRoute>} />
 <Route path="/beneficiary/track" element={<TrackRequestPage />} />
+
+<Route
+  path="/beneficiary/bonds"
+  element={<BeneficiaryBondsPage />}
+/>
 
             {/* Admin Routes */}
             <Route
@@ -229,6 +304,8 @@ const App = () => (
                 </AdminRoute>
               }
             />
+            <Route path="/admin/restaurants/donations" element={<RestaurantDonationsAdmin />} />
+
             <Route
               path="/admin/vouchers"
               element={
@@ -301,6 +378,10 @@ const App = () => (
   }
 />
 
+<Route
+  path="/admin/money-donations"
+  element={<MoneyDonationsPage />}
+/>
 
             {/* Restaurant Routes */}
 <Route path="/restaurant/login" element={<RestaurantLogin />} />
@@ -313,15 +394,6 @@ const App = () => (
         <AddDonationPage />
       </RestaurantLayout>
     </RestaurantRoute>
-  }
-/>
-
-<Route
-  path="/restaurant/donations"
-  element={
-      <RestaurantLayout>
-        <MyDonationsPage />
-      </RestaurantLayout>
   }
 />
 
@@ -360,7 +432,8 @@ const App = () => (
 
             {/* Store Routes */}
             <Route path="/store/login" element={<StoreLogin />} />
-            <Route path="/store/scan" element={<ScanVoucher />} />
+<Route path="/store/scan-voucher" element={<VoucherScanAndRedeem />} />
+
             <Route path="/store" element={<StoreDashboard />} />
             <Route
               path="/store/dashboard"

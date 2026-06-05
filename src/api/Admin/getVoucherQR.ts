@@ -8,5 +8,5 @@ export async function getVoucherQR(token: string, code: string) {
 
   if (!res.ok) throw new Error("Failed to fetch QR");
 
-  return res.blob(); // لأنه صورة
+  return res.blob(); 
 }

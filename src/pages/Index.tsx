@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Calendar, DollarSign } from "lucide-react";
+
 import {
   Heart,
   Users,
@@ -30,6 +32,7 @@ export default function Index() {
 
   const [showChallengesModal, setShowChallengesModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+const [showChallenge, setShowChallenge] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900" dir="rtl">
@@ -54,28 +57,52 @@ export default function Index() {
             </div>
           </div>
 
-         {/* NAV LINKS */}
+{/* NAV LINKS */}
 <div className="hidden lg:flex flex-row-reverse items-center gap-6">
-<button
-  onClick={() => {
-    // دائماً افتح تسجيل الدخول أولاً
-    window.location.href = "/donor/login?return=/donate-bond";
-  }}
-  className="
-    flex flex-row-reverse items-center gap-2
-    px-4 py-2
-    rounded-full
-    bg-emerald-500/10
-    text-emerald-700
-    hover:bg-emerald-600 hover:text-white
-    transition-all
-    border border-emerald-500/20
-    text-sm font-semibold
-  "
->
-  <Gift size={16} />
-  <span>أهدي سنداً</span>
-</button>
+
+  {/* زر أهدي سنداً */}
+  <button
+    onClick={() => {
+      window.location.href = "/donor/login?return=/donate-bond";
+    }}
+    className="
+      flex flex-row-reverse items-center gap-2
+      px-4 py-2
+      rounded-full
+      bg-emerald-500/10
+      text-emerald-700
+      hover:bg-emerald-600 hover:text-white
+      transition-all
+      border border-emerald-500/20
+      text-sm font-semibold
+    "
+  >
+    <Gift size={16} />
+    <span>أهدي سنداً</span>
+  </button>
+
+  {/* زر التبرع المالي */}
+  <button
+    onClick={() => {
+      window.location.href = "/donor/login?return=/donor/donate-cash";
+    }}
+    className="
+      flex flex-row-reverse items-center gap-2
+      px-4 py-2
+      rounded-full
+      bg-emerald-500/10
+      text-emerald-700
+      hover:bg-emerald-600 hover:text-white
+      transition-all
+      border border-emerald-500/20
+      text-sm font-semibold
+    "
+  >
+    <DollarSign size={16} />
+    <span>تبرع مالي</span>
+  </button>
+
+
 
 
 
@@ -84,9 +111,7 @@ export default function Index() {
     الرئيسية
   </Link>
 
-  <a href="#services" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
-    بماذا نحن
-  </a>
+
 
   <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
     من نحن
@@ -97,12 +122,7 @@ export default function Index() {
    <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
     اتصل بنا
   </a>
-   <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
-    How It Works
-  </a>
-   <a href="#process" className="text-sm font-semibold text-slate-600 hover:text-emerald-700 transition">
-    How It Works
-  </a>
+ 
 </div>
 
 
@@ -120,64 +140,131 @@ export default function Index() {
 
         
 {/* 🌙 تحدي 10 أيام رمضان */}
-<section className="max-w-7xl mx-auto px-6 py-16">
-  <div className="rounded-[2rem] bg-gradient-to-br from-emerald-700 to-emerald-900 text-white p-10 shadow-xl">
-    <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+{/* Premium Ramadan Hero */}
+<section className="relative overflow-hidden rounded-[40px] bg-[#07150F] px-10 py-16 lg:px-16 lg:py-20 mb-16 border border-white/5">
 
-      <div>
-        <h2 className="text-4xl font-black mb-4">🌙 تحدي 10 أيام رمضان</h2>
-        <p className="text-lg text-emerald-100 leading-relaxed">
-          شارك في تحدي العشرة أيام من رمضان وساهم في توزيع آلاف الوجبات على المحتاجين.
-          كل يوم يمر، يزداد الأجر وتزداد البركة.
-        </p>
+  {/* Background Glow */}
+  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-emerald-500/10 blur-[140px]" />
 
-       <div className="mt-8 flex flex-wrap gap-4">
- 
+  {/* subtle gradient */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.18),transparent_45%)]" />
 
- <Link to="/donor/ramadan">
-  <Button className="rounded-full border border-white/40 bg-white/10 px-8 py-4 font-black text-white shadow-lg hover:bg-white/20">
-    تفاصيل التحدي
-  </Button>
-</Link>
+  <div
+    className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-14"
+    dir="rtl"
+  >
 
-<Link to="/donor/login">
-  <Button className="rounded-full bg-emerald-900 px-8 py-4 font-black text-white shadow-lg hover:bg-emerald-800">
-    تبرع الآن
-  </Button>
-</Link>
+    {/* Content */}
+    <div className="max-w-2xl">
 
-</div>
+      {/* Tag */}
+      <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/10 bg-white/[0.03] px-4 py-2 backdrop-blur-xl mb-8">
+
+        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+
+        <span className="text-sm font-medium tracking-wide text-emerald-100/80">
+برنامج رمضان الخيري
+        </span>
 
       </div>
 
-      <div className="rounded-3xl bg-white/10 p-8 backdrop-blur-xl shadow-lg">
-        <h3 className="text-2xl font-black mb-4">إحصائيات التحدي</h3>
+      {/* Heading */}
+      <h1 className="text-5xl lg:text-7xl font-black leading-[1.05] tracking-tight text-white">
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div className="rounded-2xl bg-white/20 p-5 text-center">
-            <p className="text-3xl font-black">10</p>
-            <p className="text-sm text-emerald-200">عدد الأيام</p>
+        10 Days of Giving
+        <span className="block text-emerald-300 mt-2">
+          During Ramadan
+        </span>
+
+      </h1>
+
+      {/* Description */}
+      <p className="mt-7 text-lg leading-9 text-slate-300 max-w-xl">
+-انضم إلى رحلة خيرية هادفة لمدة عشرة أيام.
+<br />
+-ادعم العائلات المحتاجة بمساهمات يومية طوال شهر رمضان المبارك.
+
+      </p>
+
+      {/* Buttons */}
+      <div className="flex flex-wrap gap-4 mt-10">
+
+   <Link to="/donor/donation-type">
+  <Button
+    className="
+      h-14 px-8 rounded-2xl
+      bg-emerald-500 hover:bg-emerald-400
+      text-black font-bold text-base
+      shadow-[0_10px_40px_rgba(16,185,129,0.25)]
+      transition-all duration-300
+    "
+  >
+    شارك بالخير
+  </Button>
+</Link>
+
+        <Link to="/donor/ramadan">
+          <Button
+            className="
+              h-14 px-8 rounded-2xl
+              bg-white/[0.04]
+              border border-white/10
+              text-white
+              hover:bg-white/[0.07]
+              backdrop-blur-xl
+              font-semibold
+              transition-all duration-300
+            "
+          >
+          تفاصيل اكثر 
+          </Button>
+        </Link>
+
+      </div>
+    </div>
+
+    {/* Right Side Visual */}
+    <div className="relative hidden lg:flex items-center justify-center">
+
+      {/* outer glow */}
+      <div className="absolute w-[420px] h-[420px] rounded-full bg-emerald-400/10 blur-[120px]" />
+
+      {/* premium card */}
+      <div className="relative rounded-[36px] border border-white/10 bg-white/[0.03] backdrop-blur-2xl p-10 shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
+
+        <div className="flex items-center justify-between gap-10">
+
+          <div>
+            <p className="text-sm uppercase tracking-[0.25em] text-emerald-200/60">
+              Ramadan
+            </p>
+
+            <h3 className="text-4xl font-black text-white mt-3">
+              Giving
+            </h3>
+
+            <p className="text-slate-400 mt-4 leading-7 max-w-[220px]">
+ عشرة ايام من الخير تستهدف مئات العائلات المحتاجة في شهر رمضان المبارك.
+            </p>
           </div>
 
-          <div className="rounded-2xl bg-white/20 p-5 text-center">
-            <p className="text-3xl font-black">+5000</p>
-            <p className="text-sm text-emerald-200">وجبة مستهدفة</p>
+          {/* subtle moon */}
+          <div className="relative flex items-center justify-center">
+
+            <div className="w-40 h-40 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-500 shadow-[0_0_80px_rgba(16,185,129,0.35)]" />
+
+            <div className="absolute right-6 top-0 w-40 h-40 rounded-full bg-[#07150F]" />
+
           </div>
 
-          <div className="rounded-2xl bg-white/20 p-5 text-center">
-            <p className="text-3xl font-black">رمضان</p>
-            <p className="text-sm text-emerald-200">الشهر المبارك</p>
-          </div>
-
-          <div className="rounded-2xl bg-white/20 p-5 text-center">
-            <p className="text-3xl font-black">مفتوح</p>
-            <p className="text-sm text-emerald-200">الحالة</p>
-          </div>
         </div>
+
       </div>
 
     </div>
+
   </div>
+
 </section>
         <section className="relative overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-600 to-slate-900 px-6 py-20 text-white">
           <div className="pointer-events-none absolute -right-24 top-12 h-80 w-80 rounded-full bg-white/10 blur-3xl"></div>
@@ -409,7 +496,7 @@ export default function Index() {
               </div>
 
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-end">
-                <Link to="/individual/donate">
+<Link to="/donor/donate-cash">
                   <Button className="rounded-full bg-white px-8 py-4 text-base font-black text-emerald-900 shadow-xl shadow-black/20 hover:bg-slate-100">
                     Start Donating
                   </Button>

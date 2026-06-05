@@ -43,7 +43,7 @@ export const getAllGiftDonations = async () => {
 
 // CREATE GIFT SESSION (DONOR)
 export const createGiftSession = async (dto: any) => {
-  const res = await fetch(`/api/payment/create-session`, {
+  const res = await fetch(`/api/gift/create-session`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${getToken()}`,

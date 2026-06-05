@@ -13,6 +13,7 @@ export default function DonateBondPage() {
   const [recipientName, setRecipientName] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
+const [regionName, setRegionName] = useState("");
 
   const [loading, setLoading] = useState(false);
 
